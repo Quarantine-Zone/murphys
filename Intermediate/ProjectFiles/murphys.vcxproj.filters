@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\murphys.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{9287204E-51A0-4D96-BF7A-DECCB1FA64F4}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\murphys.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\murphysEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <Filter Include="Config">
+      <UniqueIdentifier>{E2C86DFF-D103-4B4A-9D20-DC5FD040FD94}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEditorPerProjectUserSettings.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultInput.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Source\murphys">
+      <UniqueIdentifier>{0ED5B4C9-ACC4-42EB-97B8-D4A89CD8A8CA}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\murphys\murphys.Build.cs">
+      <Filter>Source\murphys</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\murphys\murphys.cpp">
+      <Filter>Source\murphys</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\murphys\murphys.h">
+      <Filter>Source\murphys</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\murphys\murphysCharacter.cpp">
+      <Filter>Source\murphys</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\murphys\murphysCharacter.h">
+      <Filter>Source\murphys</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\murphys\murphysGameMode.cpp">
+      <Filter>Source\murphys</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\murphys\murphysGameMode.h">
+      <Filter>Source\murphys</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

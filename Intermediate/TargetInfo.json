@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "murphys",
+			"Path": "C:\\Users\\crazy\\Documents\\GitHub\\murphys\\murphys\\Source\\murphys.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "murphysEditor",
+			"Path": "C:\\Users\\crazy\\Documents\\GitHub\\murphys\\murphys\\Source\\murphysEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
