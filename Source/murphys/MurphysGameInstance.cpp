@@ -155,7 +155,7 @@ void UMurphysGameInstance::OnCreateSessionComplete(FName SessionName, bool Succe
 	}
 
 	// TODO: Update with lobby name
-	World->ServerTravel("/Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap?listen");
+	World->ServerTravel("/Game/ThirdPersonCPP/Maps/Lobby?listen");
 }
 
 void UMurphysGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result) {
