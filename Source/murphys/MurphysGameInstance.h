@@ -6,15 +6,14 @@
 #include "OnlineSubsystem.h"
 #include "Public/Interfaces/OnlineSessionInterface.h"
 #include "Engine/GameInstance.h"
+//#include "MenuSystem/MenuInterface.h"
 #include "MurphysGameInstance.generated.h"
-
 
 /**
  * 
  */
 UCLASS()
-class MURPHYS_API UMurphysGameInstance : public UGameInstance
-{
+class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 	GENERATED_BODY()
 	
 	void OnCreateSessionComplete(FName SessionName, bool Success);
@@ -28,10 +27,24 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
 
+	TSubclassOf<class UUserWidget> MenuClass;
+	TSubclassOf<class UUserWidget> InGameMenuClass;
+
+	class UMainMenu* Menu;
+
 public:
+	UMurphysGameInstance(const FObjectInitializer& ObjectInitializer);
+
 	void Host();
+
 	void Join(uint32 Index);
 
-	void MurphysGameInstance(const FObjectInitializer& ObjectInitializer);
+	void LoadMenuWidget();
+
+	void InGameLoadMenu();
+
+	void RefreshServerList();
+
+	virtual void LoadMainMenu();
 	virtual void Init();
 };
