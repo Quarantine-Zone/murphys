@@ -6,7 +6,7 @@
 #include "Engine/Engine.h"
 
 #include "UObject/ConstructorHelpers.h"
-#include "Blueprint/UserWidget.h"
+//#include "Blueprint/UserWidget.h"
 //#include "MenuSystem/MainMenu.h"
 //#include "MenuSystem/MenuWidget.h"
 
@@ -141,28 +141,30 @@ void UMurphysGameInstance::CreateSession() {
 
 	// Create a new session
 	FOnlineSessionSettings settings;
-	settings.bIsLANMatch = true;
+	settings.bIsLANMatch = false;
 	settings.NumPublicConnections = 2;
 	settings.bShouldAdvertise = true;
+	settings.bUsesPresence = true;
 	SessionInterface->CreateSession(0, SESSION_NAME, settings);
 }
 
 void UMurphysGameInstance::Join(uint32 Index) {
-	if (!SessionInterface.IsValid() || SessionSearch.IsValid()) {
+	if (!SessionInterface.IsValid() || !SessionSearch.IsValid()) {
 		return;
 	}
 
 	/*if (Menu != nullptr) {
-		Menu->SetServerList({ "Test1", "Test2" });
+		Menu->Teardown();
 	}*/
 
-	//SessionInterface->JoinSession(0, SESSION_NAME, SessionSearch->SearchResults[Index]);
+	SessionInterface->JoinSession(0, SESSION_NAME, SessionSearch->SearchResults[Index]);
 }
 
 void UMurphysGameInstance::RefreshServerList() {
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	if (SessionSearch.IsValid()) {
-		//SessionSearch->bIsLanQuery = true;
+		SessionSearch->MaxSearchResults = 100;
+		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 		UE_LOG(LogTemp, Warning, TEXT("Starting to find sessions..."));
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 	}
@@ -199,7 +201,7 @@ void UMurphysGameInstance::OnCreateSessionComplete(FName SessionName, bool Succe
 	}
 
 	// TODO: Update with lobby name
-	World->ServerTravel("/Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap?listen");
+	World->ServerTravel("/Game/ThirdPersonCPP/Maps/Lobby?listen");
 }
 
 void UMurphysGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result) {
@@ -236,7 +238,8 @@ void UMurphysGameInstance::OnFindSessionComplete(bool Success) {
 	TArray<FString> ServerNames;
 	UE_LOG(LogTemp, Warning, TEXT("Find sessions completed"));
 	for (const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults) {
-		UE_LOG(LogTemp, Warning, TEXT("Found session named %s"), *SearchResult.GetSessionIdStr());
+		UE_LOG(LogTemp, Warning, TEXT("Found session named %s"), *SearchResult.GetSessionIdStr());		
+		
 		ServerNames.Add(SearchResult.GetSessionIdStr());
 	}
 
