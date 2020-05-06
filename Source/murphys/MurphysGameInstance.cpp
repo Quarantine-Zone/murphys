@@ -13,7 +13,7 @@
 const static FName SESSION_NAME = TEXT("Test Session");
 
 UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectInitializer) {
-	/*ConstructorHelpers::FClassFinder<UUserWidget> MenuBPClass(TEXT("/Game/MenuSystem/WBP_MainMenu"));
+	ConstructorHelpers::FClassFinder<UUserWidget> MenuBPClass(TEXT("/Game/MenuSystem/WBP_MainMenu"));
 	if (!ensure(MenuBPClass.Class != nullptr)) return;
 
 	MenuClass = MenuBPClass.Class;
@@ -21,18 +21,61 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 	ConstructorHelpers::FClassFinder<UUserWidget> InGameMenuBPClass(TEXT("/Game/MenuSystem/WBP_InGameMenu"));
 	if (!ensure(InGameMenuBPClass.Class != nullptr)) return;
 
-	InGameMenuClass = InGameMenuBPClass.Class;*/
+	InGameMenuClass = InGameMenuBPClass.Class;
+}
+
+// Alex Made this to load menu
+void UMurphysGameInstance::LoadMenu()
+{
+	if (!ensure(MenuClass != nullptr)) return;
+	UUserWidget* Menu_ = CreateWidget<UUserWidget>(this, MenuClass);
+	if (!ensure(Menu_ != nullptr)) return;
+
+	Menu_->AddToViewport();
+
+}
+
+void UMurphysGameInstance::LoadInGameMenu()
+{
+
+	if (!ensure(InGameMenuClass != nullptr)) return;
+	UUserWidget* Menu_ = CreateWidget<UUserWidget>(this, InGameMenuClass);
+	if (!ensure(Menu_ != nullptr)) return;
+
+	Menu_->AddToViewport();
+
+	/*
+	//===========================================================================
+	// display menu stuff, lock down input mode, idk WIP.
+	Menu = CreateWidget<UMainMenu>(this, MenuClass);
+	if (!ensure(Menu != nullptr)) return;
+	//
+	APlayerController* PlayerController = GetFirstLocalPlayerController();
+	if (!ensure(PlayerController != nullptr)) return;
+
+	FInputModeUIOnly InputModeData;
+	InputModeData.SetWidgetToFocus(Menu->TakeWidget());
+	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+
+	PlayerController->SetInputMode(InputModeData);
+
+	PlayerController->bShowMouseCursor = true;
+	//==========================================================================
+	*/
+
 }
 
 void UMurphysGameInstance::LoadMenuWidget() {
-	/*if (!ensure(MenuClass != nullptr)) return;
-
+	if (!ensure(MenuClass != nullptr)) return;
+	
+	/*
 	Menu = CreateWidget<UMainMenu>(this, MenuClass);
 	if (!ensure(Menu != nullptr)) return;
 
 	Menu->Setup();
 
-	Menu->SetMenuInterface(this);*/
+	Menu->SetMenuInterface(this);
+	*/
 }
 
 void UMurphysGameInstance::InGameLoadMenu() {
@@ -44,6 +87,9 @@ void UMurphysGameInstance::InGameLoadMenu() {
 	Menu->Setup();
 
 	Menu->SetMenuInterface(this);*/
+
+	
+
 }
 
 void UMurphysGameInstance::LoadMainMenu() {

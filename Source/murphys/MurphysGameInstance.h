@@ -6,6 +6,7 @@
 #include "OnlineSubsystem.h"
 #include "Public/Interfaces/OnlineSessionInterface.h"
 #include "Engine/GameInstance.h"
+#include "Blueprint/UserWidget.h"
 //#include "MenuSystem/MenuInterface.h"
 #include "MurphysGameInstance.generated.h"
 
@@ -35,9 +36,22 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 public:
 	UMurphysGameInstance(const FObjectInitializer& ObjectInitializer);
 
+
+	//Alex made this to load the menu on game start
+	// did not want to f up JT's stuff since it doesn't
+	// seem to quite match up with what he was doing.
+	UFUNCTION(BlueprintCallable)
+	void LoadMenu();
+
+	UFUNCTION(Exec)
+	void LoadInGameMenu();
+
+	UFUNCTION(Exec)
 	void Host();
 
+	UFUNCTION(Exec)
 	void Join(uint32 Index);
+
 
 	void LoadMenuWidget();
 
