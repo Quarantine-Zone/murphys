@@ -27,12 +27,12 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 void UMurphysGameInstance::LoadInGameMenu()
 {
 	if (!ensure(InGameMenuClass != nullptr)) return;
-	UUserWidget* Menu_ = CreateWidget<UUserWidget>(this, InGameMenuClass);
-	if (!ensure(Menu_ != nullptr)) return;
-	Menu_->AddToViewport();
+	UUserWidget* InGameMenu = CreateWidget<UUserWidget>(this, InGameMenuClass);
+	if (!ensure(InGameMenu != nullptr)) return;
+	InGameMenu->AddToViewport();
 
 	FInputModeUIOnly InputModeData;
-	InputModeData.SetWidgetToFocus(Menu_->TakeWidget());
+	InputModeData.SetWidgetToFocus(InGameMenu->TakeWidget());
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 
 	APlayerController* PlayerController = GetFirstLocalPlayerController();
@@ -51,17 +51,6 @@ void UMurphysGameInstance::LoadMenuWidget() {
 	Menu->Setup();
 
 	Menu->SetGameInstance(this);
-}
-
-void UMurphysGameInstance::InGameLoadMenu() {
-	if (!ensure(InGameMenuClass != nullptr)) return;
-
-	/*UMenuWidget* Menu = CreateWidget<UMenuWidget>(this, InGameMenuClass);
-	if (!ensure(Menu != nullptr)) return;
-
-	Menu->Setup();
-
-	Menu->SetMenuInterface(this);*/
 }
 
 void UMurphysGameInstance::LoadMainMenu() {

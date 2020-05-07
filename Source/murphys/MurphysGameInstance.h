@@ -44,7 +44,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LoadMenuWidget();
 
-	void InGameLoadMenu();
+	UFUNCTION(Exec)
+	void LoadInGameMenu();
 
 	void RefreshServerList();
 
