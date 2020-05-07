@@ -24,6 +24,24 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 	InGameMenuClass = InGameMenuBPClass.Class;
 }
 
+void UMurphysGameInstance::LoadInGameMenu()
+{
+	if (!ensure(InGameMenuClass != nullptr)) return;
+	UUserWidget* Menu_ = CreateWidget<UUserWidget>(this, InGameMenuClass);
+	if (!ensure(Menu_ != nullptr)) return;
+	Menu_->AddToViewport();
+
+	FInputModeUIOnly InputModeData;
+	InputModeData.SetWidgetToFocus(Menu_->TakeWidget());
+	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+
+	APlayerController* PlayerController = GetFirstLocalPlayerController();
+	if (!ensure(PlayerController != nullptr)) return;
+	PlayerController->SetInputMode(InputModeData);
+
+	PlayerController->bShowMouseCursor = true;
+}
+
 void UMurphysGameInstance::LoadMenuWidget() {
 	if (!ensure(MenuClass != nullptr)) return;
 	

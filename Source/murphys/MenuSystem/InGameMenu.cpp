@@ -47,5 +47,19 @@ void UInGameMenu::OpenOptionsMenu()
 
 void UInGameMenu::ResumeGame()
 {
+	if (InGameMenu != nullptr)
+	{
+		this->RemoveFromViewport();
 
+		UWorld* World = GetWorld();
+		if (!ensure(World != nullptr)) return;
+
+		APlayerController* PlayerController = World->GetFirstPlayerController();
+		if (!ensure(PlayerController != nullptr)) return;
+
+		FInputModeGameOnly InputModeData;
+		PlayerController->SetInputMode(InputModeData);
+
+		PlayerController->bShowMouseCursor = false;
+	}
 }
