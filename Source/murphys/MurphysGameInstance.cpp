@@ -107,10 +107,13 @@ void UMurphysGameInstance::CreateSession() {
 	if (IOnlineSubsystem::Get()->GetSubsystemName() == "NULL")
 	{
 		SessionSettings.bIsLANMatch = true;
+		UE_LOG(LogTemp, Warning, TEXT("Local"));
 	}
 	else
 	{
 		SessionSettings.bIsLANMatch = false;
+		UE_LOG(LogTemp, Warning, TEXT("Steam"));
+
 	}
 	SessionSettings.NumPublicConnections = 5;
 	SessionSettings.bShouldAdvertise = true;
