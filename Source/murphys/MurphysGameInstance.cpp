@@ -41,28 +41,18 @@ void UMurphysGameInstance::LoadInGameMenu()
 	if (!ensure(InGameMenuClass != nullptr)) return;
 	UUserWidget* Menu_ = CreateWidget<UUserWidget>(this, InGameMenuClass);
 	if (!ensure(Menu_ != nullptr)) return;
-
 	Menu_->AddToViewport();
 
-	/*
-	//===========================================================================
-	// display menu stuff, lock down input mode, idk WIP.
-	Menu = CreateWidget<UMainMenu>(this, MenuClass);
-	if (!ensure(Menu != nullptr)) return;
-	//
-	APlayerController* PlayerController = GetFirstLocalPlayerController();
-	if (!ensure(PlayerController != nullptr)) return;
-
 	FInputModeUIOnly InputModeData;
-	InputModeData.SetWidgetToFocus(Menu->TakeWidget());
+	InputModeData.SetWidgetToFocus(Menu_->TakeWidget());
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 
+	APlayerController* PlayerController = GetFirstLocalPlayerController();
+	if (!ensure(PlayerController != nullptr)) return;
 	PlayerController->SetInputMode(InputModeData);
 
 	PlayerController->bShowMouseCursor = true;
-	//==========================================================================
-	*/
-
+	
 }
 
 void UMurphysGameInstance::LoadMenuWidget() {
