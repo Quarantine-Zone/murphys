@@ -10,7 +10,6 @@
 #include "MenuSystem/MainMenu.h"
 
 const static FName SESSION_NAME = TEXT("Game");
-const static FName SERVER_NAME_SETTINGS_KEY = TEXT("ServerName");
 
 UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectInitializer) {
 	ConstructorHelpers::FClassFinder<UUserWidget> MenuBPClass(TEXT("/Game/MenuSystem/WBP_MainMenu"));
@@ -58,8 +57,6 @@ void UMurphysGameInstance::LoadMainMenu() {
 	if (!ensure(PlayerController != nullptr)) return;
 
 	PlayerController->ClientTravel("/Game/MenuSystem/MainMenu", ETravelType::TRAVEL_Absolute);
-
-
 }
 
 void UMurphysGameInstance::Init() {
@@ -82,8 +79,8 @@ void UMurphysGameInstance::Init() {
 }
 
 // Should be called via the main menu to create a new session
-void UMurphysGameInstance::Host(FString ServerName) {
-	DesiredServerName = ServerName;
+void UMurphysGameInstance::Host(FServerSettings Settings) {
+	ServerSettings = Settings;
 	if (!SessionInterface.IsValid()) {
 		return;
 	}
@@ -107,18 +104,27 @@ void UMurphysGameInstance::CreateSession() {
 	if (IOnlineSubsystem::Get()->GetSubsystemName() == "NULL")
 	{
 		SessionSettings.bIsLANMatch = true;
-		UE_LOG(LogTemp, Warning, TEXT("Local"));
+		UE_LOG(LogTemp, Warning, TEXT("Starting a local session..."));
 	}
 	else
 	{
 		SessionSettings.bIsLANMatch = false;
-		UE_LOG(LogTemp, Warning, TEXT("Steam"));
+		UE_LOG(LogTemp, Warning, TEXT("Starting a steam session..."));
+	} 
 
+	if (ServerSettings.ServerName.IsEmpty()) {
+		UE_LOG(LogTemp, Warning, TEXT("Server name not set, cancelling session creation"));
+		return;
 	}
-	SessionSettings.NumPublicConnections = 5;
-	SessionSettings.bShouldAdvertise = true;
+
+	// Setup session settings
+	SessionSettings.NumPublicConnections = ServerSettings.MaxPlayers;
+	SessionSettings.bShouldAdvertise = !ServerSettings.Private;
 	SessionSettings.bUsesPresence = true;
-	SessionSettings.Set(SERVER_NAME_SETTINGS_KEY, DesiredServerName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+	SessionSettings.bIsDedicated = false;
+	SessionSettings.bAllowInvites = true;
+	SessionSettings.bAllowJoinInProgress = true;
+	SessionSettings.Set("ServerName", ServerSettings.ServerName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
 	SessionInterface->CreateSession(0, SESSION_NAME, SessionSettings);
 }
@@ -202,8 +208,6 @@ void UMurphysGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessi
 		return;
 	}
 
-	Engine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Joining %s"), *Address);
-
 	APlayerController* PlayerController = GetFirstLocalPlayerController();
 	if (!ensure(PlayerController != nullptr)) {
 		return;
@@ -228,14 +232,15 @@ void UMurphysGameInstance::OnFindSessionComplete(bool Success) {
 		Data.HostUsername = SearchResult.Session.OwningUserName;
 		FString ServerName;
 
-		if (SearchResult.Session.SessionSettings.Get(SERVER_NAME_SETTINGS_KEY, ServerName))
+		if (SearchResult.Session.SessionSettings.Get("ServerName", ServerName))
 		{
 			Data.Name = ServerName;
 		}
 		else
 		{
-			Data.Name = "Could not find name.";
+			Data.Name = "No name set";
 		}
+
 		ServerNames.Add(Data);
 	}
 

@@ -9,6 +9,16 @@
 #include "Blueprint/UserWidget.h"
 #include "MurphysGameInstance.generated.h"
 
+USTRUCT()
+struct FServerSettings
+{
+	GENERATED_BODY()
+
+	FString ServerName;
+	uint16 MaxPlayers = 5;
+	bool Private = false;
+};
+
 /**
  * 
  */
@@ -22,7 +32,7 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 	void CreateSession();
-	FString DesiredServerName;
+	FServerSettings ServerSettings;
 
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
@@ -36,7 +46,7 @@ public:
 	UMurphysGameInstance(const FObjectInitializer& ObjectInitializer);
 
 	UFUNCTION(Exec)
-	void Host(FString ServerName);
+	void Host(FServerSettings ServerSettings);
 
 	UFUNCTION(Exec)
 	void Join(uint32 Index);

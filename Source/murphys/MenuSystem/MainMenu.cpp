@@ -95,8 +95,9 @@ void UMainMenu::HostServer()
 	if (GameInstance != nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("I'm gonna Wreck it!"));
-		//FString ServerName = ServerHostName->Text.ToString();
-		GameInstance->Host("ServerName");
+		FServerSettings ServerSettings;
+		ServerSettings.ServerName = "Test Server Name";//ServerHostName->Text.ToString();
+		GameInstance->Host(ServerSettings);
 	}
 }
 
