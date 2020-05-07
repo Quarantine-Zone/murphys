@@ -6,6 +6,5 @@ Once you've pulled the repo, do the following.
 3) Re-generate C++ solution (File -> Generate Visual Studio Project)
 
 
-# Getting Multiplayer Setup
-1) Go to partner.steamgames.com and login
-2) Sign the NDA and Download latest SDK
+# Multiplayer
+1) In order for more than two people to play on multiplayer, the game must be ran in a packaged executable
