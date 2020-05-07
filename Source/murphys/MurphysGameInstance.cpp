@@ -121,8 +121,6 @@ void UMurphysGameInstance::CreateSession() {
 	SessionSettings.NumPublicConnections = ServerSettings.MaxPlayers;
 	SessionSettings.bShouldAdvertise = !ServerSettings.Private;
 	SessionSettings.bUsesPresence = true;
-	SessionSettings.bIsDedicated = false;
-	SessionSettings.bAllowInvites = true;
 	SessionSettings.bAllowJoinInProgress = true;
 	SessionSettings.Set("ServerName", ServerSettings.ServerName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
@@ -144,7 +142,7 @@ void UMurphysGameInstance::Join(uint32 Index) {
 void UMurphysGameInstance::RefreshServerList() {
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	if (SessionSearch.IsValid()) {
-		SessionSearch->MaxSearchResults = 100;
+		SessionSearch->MaxSearchResults = 10000000;
 		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 		UE_LOG(LogTemp, Warning, TEXT("Starting to find sessions..."));
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
