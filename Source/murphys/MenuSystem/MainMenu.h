@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/EditableTextBox.h"
+#include "Components/Slider.h"
 #include "../MurphysGameInstance.h"
 #include "MainMenu.generated.h"
 
@@ -46,42 +48,47 @@ private:
 	UMurphysGameInstance* GameInstance;
 	TSubclassOf<class UUserWidget> ServerRowClass;
 	
-	// Buttons
-	UPROPERTY(meta = (BindWidget))
-	class UButton* HostButton;
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* JoinMenuButton;
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* JoinMenuBackButton;
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* JoinServerButton;
-
-	UPROPERTY(meta = (BindWidget))
-	class UWidgetSwitcher* MenuSwitcher;
-
 	UPROPERTY(meta = (BindWidget))
 	class UWidget* MainMenu;
 
 	UPROPERTY(meta = (BindWidget))
 	class UWidget* JoinMenu;
 
-	/*UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget))
 	class UWidget* HostMenu;
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* ServerHostName;
+	class UWidgetSwitcher* MenuSwitcher;
+
+	// Main menu buttons
+	UPROPERTY(meta = (BindWidget))
+	class UButton* OpenHostMenuButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* CancelHostMenuButton;
+	class UButton* OpenJoinMenuButton;
+
+	// Join menu controls
+	UPROPERTY(meta = (BindWidget))
+	class UButton* JoinMenuBackButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* ConfirmHostMenuButton;*/
+	class UButton* JoinMenuExecuteButton;
 
 	UPROPERTY(meta = (BindWidget))
 	class UPanelWidget* ServerList;
+
+	// Host menu controls
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* HostServerName;
+
+	UPROPERTY(meta = (BindWidget))
+	class USlider* HostNumPlayers;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* HostMenuBackButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* HostMenuExecuteButton;
 
 	UFUNCTION()
 	void HostServer();

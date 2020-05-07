@@ -52,16 +52,12 @@ public:
 	void Join(uint32 Index);
 
 	UFUNCTION(BlueprintCallable)
-	void LoadMenuWidget();
+	void LoadMainMenu();
 
 	UFUNCTION(Exec)
 	void LoadInGameMenu();
 
 	void RefreshServerList();
-
-	void StartSession();
 	
-	void LoadMainMenu();
-
 	void Init();
 };
