@@ -19,39 +19,39 @@ protected:
 private:
 	// Buttons
 	UPROPERTY(meta = (BindWidget))
-		class UButton* ResumeButton;
+	class UButton* ResumeButton;
 
 	UPROPERTY(meta = (BindWidget))
-		class UButton* OptionsButton;
+	class UButton* OptionsButton;
 
 	UPROPERTY(meta = (BindWidget))
-		class UButton* ExitToMainButton;
+	class UButton* ExitToMainButton;
 
 	UPROPERTY(meta = (BindWidget))
-		class UButton* OptionsBackButton;
+	class UButton* OptionsBackButton;
 
 	//Menu Switcher
 	UPROPERTY(meta = (BindWidget))
-		class UWidgetSwitcher* InGameMenuSwitcher;
+	class UWidgetSwitcher* InGameMenuSwitcher;
+	
 	//Switcher Sub-Menus
 	UPROPERTY(meta = (BindWidget))
-		class UWidget* InGameMenu;
+	class UWidget* InGameMenu;
 
 	UPROPERTY(meta = (BindWidget))
-		class UWidget* InGameOptionsMenu;
+	class UWidget* InGameOptionsMenu;
 
 	// callback funtions
+	UFUNCTION()
+	void ExitToMain();
 
 	UFUNCTION()
-		void ExitToMain();
+	void BackToInGameMenu();
 
 	UFUNCTION()
-		void BackToInGameMenu();
+	void OpenOptionsMenu();
 
 	UFUNCTION()
-		void OpenOptionsMenu();
-
-	UFUNCTION()
-		void ResumeGame();
+	void ResumeGame();
 
 };

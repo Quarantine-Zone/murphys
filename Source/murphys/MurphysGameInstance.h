@@ -7,7 +7,6 @@
 #include "Public/Interfaces/OnlineSessionInterface.h"
 #include "Engine/GameInstance.h"
 #include "Blueprint/UserWidget.h"
-//#include "MenuSystem/MenuInterface.h"
 #include "MurphysGameInstance.generated.h"
 
 /**
@@ -20,10 +19,10 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 	void OnCreateSessionComplete(FName SessionName, bool Success);
 	void OnDestroySessionComplete(FName SessionName, bool Success);
 	void OnFindSessionComplete(bool Success);
-
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 	void CreateSession();
+	FString DesiredServerName;
 
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
@@ -36,29 +35,22 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 public:
 	UMurphysGameInstance(const FObjectInitializer& ObjectInitializer);
 
-
-	//Alex made this to load the menu on game start
-	// did not want to f up JT's stuff since it doesn't
-	// seem to quite match up with what he was doing.
-	UFUNCTION(BlueprintCallable)
-	void LoadMenu();
-
 	UFUNCTION(Exec)
-	void LoadInGameMenu();
-
-	UFUNCTION(Exec)
-	void Host();
+	void Host(FString ServerName);
 
 	UFUNCTION(Exec)
 	void Join(uint32 Index);
 
-
+	UFUNCTION(BlueprintCallable)
 	void LoadMenuWidget();
 
 	void InGameLoadMenu();
 
 	void RefreshServerList();
 
-	virtual void LoadMainMenu();
-	virtual void Init();
+	void StartSession();
+	
+	void LoadMainMenu();
+
+	void Init();
 };

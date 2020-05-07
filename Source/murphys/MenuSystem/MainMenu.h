@@ -4,7 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "../MurphysGameInstance.h"
 #include "MainMenu.generated.h"
+
+USTRUCT()
+struct FServerData
+{
+	GENERATED_BODY()
+
+	FString Name;
+	uint16 CurrentPlayers;
+	uint16 MaxPlayers;
+	FString HostUsername;
+};
+
 
 /**
  * 
@@ -13,11 +26,26 @@ UCLASS()
 class MURPHYS_API UMainMenu : public UUserWidget
 {
 	GENERATED_BODY()
+
+public: 
+	UMainMenu(const FObjectInitializer& ObjectInitializer);
+
+	void SetServerList(TArray<FServerData> ServerNames);
+
+	void SelectIndex(uint32 Index);
+
+	void Setup();
+	void Teardown();
+
+	void SetGameInstance(UMurphysGameInstance* Instance);
 	
 protected:
 	virtual bool Initialize();
 
 private:	
+	UMurphysGameInstance* GameInstance;
+	TSubclassOf<class UUserWidget> ServerRowClass;
+	
 	// Buttons
 	UPROPERTY(meta = (BindWidget))
 	class UButton* HostButton;
@@ -31,28 +59,54 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* JoinServerButton;
 
-	//Menu Switcher
 	UPROPERTY(meta = (BindWidget))
 	class UWidgetSwitcher* MenuSwitcher;
-	//Switcher Sub-Menus
+
 	UPROPERTY(meta = (BindWidget))
 	class UWidget* MainMenu;
 
 	UPROPERTY(meta = (BindWidget))
 	class UWidget* JoinMenu;
 
-	// callback funtions
+	/*UPROPERTY(meta = (BindWidget))
+	class UWidget* HostMenu;
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* ServerHostName;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* CancelHostMenuButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* ConfirmHostMenuButton;*/
+
+	UPROPERTY(meta = (BindWidget))
+	class UPanelWidget* ServerList;
 
 	UFUNCTION()
 	void HostServer();
 
 	UFUNCTION()
+	void JoinServer();
+
+	UFUNCTION()
 	void BackToMainMenu();
+
+	UFUNCTION()
+	void OpenHostMenu();
 
 	UFUNCTION()
 	void OpenJoinMenu();
 
 	UFUNCTION()
-	void JoinServer();
+	void OpenMainMenu();
 
+	UFUNCTION()
+	void QuitPressed();
+
+	TOptional<uint32> SelectedIndex;
+
+	void UpdateChildren();
 };
+
+

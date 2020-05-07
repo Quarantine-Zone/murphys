@@ -6,11 +6,11 @@
 #include "Engine/Engine.h"
 
 #include "UObject/ConstructorHelpers.h"
-//#include "Blueprint/UserWidget.h"
-//#include "MenuSystem/MainMenu.h"
-//#include "MenuSystem/MenuWidget.h"
+#include "Blueprint/UserWidget.h"
+#include "MenuSystem/MainMenu.h"
 
-const static FName SESSION_NAME = TEXT("Test Session");
+const static FName SESSION_NAME = TEXT("Game");
+const static FName SERVER_NAME_SETTINGS_KEY = TEXT("ServerName");
 
 UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectInitializer) {
 	ConstructorHelpers::FClassFinder<UUserWidget> MenuBPClass(TEXT("/Game/MenuSystem/WBP_MainMenu"));
@@ -24,72 +24,26 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 	InGameMenuClass = InGameMenuBPClass.Class;
 }
 
-// Alex Made this to load menu
-void UMurphysGameInstance::LoadMenu()
-{
-	if (!ensure(MenuClass != nullptr)) return;
-	UUserWidget* Menu_ = CreateWidget<UUserWidget>(this, MenuClass);
-	if (!ensure(Menu_ != nullptr)) return;
-
-	Menu_->AddToViewport();
-
-}
-
-void UMurphysGameInstance::LoadInGameMenu()
-{
-
-	if (!ensure(InGameMenuClass != nullptr)) return;
-	UUserWidget* Menu_ = CreateWidget<UUserWidget>(this, InGameMenuClass);
-	if (!ensure(Menu_ != nullptr)) return;
-
-	Menu_->AddToViewport();
-
-	/*
-	//===========================================================================
-	// display menu stuff, lock down input mode, idk WIP.
-	Menu = CreateWidget<UMainMenu>(this, MenuClass);
-	if (!ensure(Menu != nullptr)) return;
-	//
-	APlayerController* PlayerController = GetFirstLocalPlayerController();
-	if (!ensure(PlayerController != nullptr)) return;
-
-	FInputModeUIOnly InputModeData;
-	InputModeData.SetWidgetToFocus(Menu->TakeWidget());
-	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-
-	PlayerController->SetInputMode(InputModeData);
-
-	PlayerController->bShowMouseCursor = true;
-	//==========================================================================
-	*/
-
-}
-
 void UMurphysGameInstance::LoadMenuWidget() {
 	if (!ensure(MenuClass != nullptr)) return;
 	
-	/*
 	Menu = CreateWidget<UMainMenu>(this, MenuClass);
 	if (!ensure(Menu != nullptr)) return;
 
 	Menu->Setup();
 
-	Menu->SetMenuInterface(this);
-	*/
+	Menu->SetGameInstance(this);
 }
 
 void UMurphysGameInstance::InGameLoadMenu() {
-	/*if (!ensure(InGameMenuClass != nullptr)) return;
+	if (!ensure(InGameMenuClass != nullptr)) return;
 
-	UMenuWidget* Menu = CreateWidget<UMenuWidget>(this, InGameMenuClass);
+	/*UMenuWidget* Menu = CreateWidget<UMenuWidget>(this, InGameMenuClass);
 	if (!ensure(Menu != nullptr)) return;
 
 	Menu->Setup();
 
 	Menu->SetMenuInterface(this);*/
-
-	
-
 }
 
 void UMurphysGameInstance::LoadMainMenu() {
@@ -97,6 +51,8 @@ void UMurphysGameInstance::LoadMainMenu() {
 	if (!ensure(PlayerController != nullptr)) return;
 
 	PlayerController->ClientTravel("/Game/MenuSystem/MainMenu", ETravelType::TRAVEL_Absolute);
+
+
 }
 
 void UMurphysGameInstance::Init() {
@@ -119,7 +75,8 @@ void UMurphysGameInstance::Init() {
 }
 
 // Should be called via the main menu to create a new session
-void UMurphysGameInstance::Host() {
+void UMurphysGameInstance::Host(FString ServerName) {
+	DesiredServerName = ServerName;
 	if (!SessionInterface.IsValid()) {
 		return;
 	}
@@ -139,13 +96,21 @@ void UMurphysGameInstance::CreateSession() {
 		return;
 	}
 
-	// Create a new session
-	FOnlineSessionSettings settings;
-	settings.bIsLANMatch = false;
-	settings.NumPublicConnections = 2;
-	settings.bShouldAdvertise = true;
-	settings.bUsesPresence = true;
-	SessionInterface->CreateSession(0, SESSION_NAME, settings);
+	FOnlineSessionSettings SessionSettings;
+	if (IOnlineSubsystem::Get()->GetSubsystemName() == "NULL")
+	{
+		SessionSettings.bIsLANMatch = true;
+	}
+	else
+	{
+		SessionSettings.bIsLANMatch = false;
+	}
+	SessionSettings.NumPublicConnections = 5;
+	SessionSettings.bShouldAdvertise = true;
+	SessionSettings.bUsesPresence = true;
+	SessionSettings.Set(SERVER_NAME_SETTINGS_KEY, DesiredServerName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+
+	SessionInterface->CreateSession(0, SESSION_NAME, SessionSettings);
 }
 
 void UMurphysGameInstance::Join(uint32 Index) {
@@ -153,9 +118,9 @@ void UMurphysGameInstance::Join(uint32 Index) {
 		return;
 	}
 
-	/*if (Menu != nullptr) {
+	if (Menu != nullptr) {
 		Menu->Teardown();
-	}*/
+	}
 
 	SessionInterface->JoinSession(0, SESSION_NAME, SessionSearch->SearchResults[Index]);
 }
@@ -177,6 +142,13 @@ void UMurphysGameInstance::OnDestroySessionComplete(FName SessionName, bool Succ
 	}
 }
 
+void UMurphysGameInstance::StartSession() {
+	if (SessionInterface.IsValid())
+	{
+		SessionInterface->StartSession(SESSION_NAME);
+	}
+}
+
 // Delegate callback once a session has been created
 void UMurphysGameInstance::OnCreateSessionComplete(FName SessionName, bool Success) {
 	if (!Success) {
@@ -189,9 +161,9 @@ void UMurphysGameInstance::OnCreateSessionComplete(FName SessionName, bool Succe
 		return;
 	}
 
-	/*if (Menu != nullptr) {
+	if (Menu != nullptr) {
 		Menu->Teardown();
-	}*/
+	}
 
 	Engine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Hosting"));
 
@@ -235,13 +207,27 @@ void UMurphysGameInstance::OnFindSessionComplete(bool Success) {
 		return;
 	}
 
-	TArray<FString> ServerNames;
+	TArray<FServerData> ServerNames;
 	UE_LOG(LogTemp, Warning, TEXT("Find sessions completed"));
 	for (const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults) {
 		UE_LOG(LogTemp, Warning, TEXT("Found session named %s"), *SearchResult.GetSessionIdStr());		
 		
-		ServerNames.Add(SearchResult.GetSessionIdStr());
+		FServerData Data;
+		Data.MaxPlayers = SearchResult.Session.SessionSettings.NumPublicConnections;
+		Data.CurrentPlayers = Data.MaxPlayers - SearchResult.Session.NumOpenPublicConnections;
+		Data.HostUsername = SearchResult.Session.OwningUserName;
+		FString ServerName;
+
+		if (SearchResult.Session.SessionSettings.Get(SERVER_NAME_SETTINGS_KEY, ServerName))
+		{
+			Data.Name = ServerName;
+		}
+		else
+		{
+			Data.Name = "Could not find name.";
+		}
+		ServerNames.Add(Data);
 	}
 
-	//Menu->SetServerList(ServerNames);
+	Menu->SetServerList(ServerNames);
 }
