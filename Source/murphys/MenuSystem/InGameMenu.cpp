@@ -4,6 +4,7 @@
 #include "InGameMenu.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
+#include "../MurphysGameInstance.h"
 
 
 bool UInGameMenu::Initialize()
@@ -12,23 +13,17 @@ bool UInGameMenu::Initialize()
 	if (!Success) return false;
 
 	if (!ensure(ResumeButton != nullptr)) return false;
-	ResumeButton->OnClicked.AddDynamic(this, &UInGameMenu::ResumeGame);
+	ResumeButton->Button->OnClicked.AddDynamic(this, &UInGameMenu::ResumeGame);
 
 	if (!ensure(OptionsButton != nullptr)) return false;
-	OptionsButton->OnClicked.AddDynamic(this, &UInGameMenu::OpenOptionsMenu);
+	OptionsButton->Button->OnClicked.AddDynamic(this, &UInGameMenu::OpenOptionsMenu);
 
 	if (!ensure(OptionsBackButton != nullptr)) return false;
-	OptionsBackButton->OnClicked.AddDynamic(this, &UInGameMenu::BackToInGameMenu);
+	OptionsBackButton->Button->OnClicked.AddDynamic(this, &UInGameMenu::BackToInGameMenu);
 
 	if (!ensure(ExitToMainButton != nullptr)) return false;
-	ExitToMainButton->OnClicked.AddDynamic(this, &UInGameMenu::ExitToMain);
 
 	return true;
-}
-
-void UInGameMenu::ExitToMain()
-{
-	UE_LOG(LogTemp, Warning, TEXT("I don't work yet"));
 }
 
 void UInGameMenu::BackToInGameMenu()
