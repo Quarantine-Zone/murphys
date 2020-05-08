@@ -7,6 +7,7 @@
 #include "Components/EditableTextBox.h"
 #include "Components/Slider.h"
 #include "../MurphysGameInstance.h"
+#include "../Panels/MurphysButton.h"
 #include "MainMenu.generated.h"
 
 USTRUCT()
@@ -62,17 +63,20 @@ private:
 
 	// Main menu buttons
 	UPROPERTY(meta = (BindWidget))
-	class UButton* OpenHostMenuButton;
+	class UMurphysButton* OpenHostMenuButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* OpenJoinMenuButton;
+	class UMurphysButton* OpenJoinMenuButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UMurphysButton* QuitGameButton;
 
 	// Join menu controls
 	UPROPERTY(meta = (BindWidget))
-	class UButton* JoinMenuBackButton;
+	class UMurphysButton* JoinMenuBackButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* JoinMenuExecuteButton;
+	class UMurphysButton* JoinMenuExecuteButton;
 
 	UPROPERTY(meta = (BindWidget))
 	class UPanelWidget* ServerList;
@@ -85,10 +89,10 @@ private:
 	class USlider* HostNumPlayers;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* HostMenuBackButton;
+	class UMurphysButton* HostMenuBackButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* HostMenuExecuteButton;
+	class UMurphysButton* HostMenuExecuteButton;
 
 	UFUNCTION()
 	void HostServer();

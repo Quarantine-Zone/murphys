@@ -28,24 +28,27 @@ bool UMainMenu::Initialize()
 
 	// Main menu bindings
 	if (!ensure(OpenHostMenuButton != nullptr)) return false;
-	OpenHostMenuButton->OnClicked.AddDynamic(this, &UMainMenu::OpenHostMenu);
+	OpenHostMenuButton->Button->OnClicked.AddDynamic(this, &UMainMenu::OpenHostMenu);
 
 	if (!ensure(OpenJoinMenuButton != nullptr)) return false;
-	OpenJoinMenuButton->OnClicked.AddDynamic(this, &UMainMenu::OpenJoinMenu);
+	OpenJoinMenuButton->Button->OnClicked.AddDynamic(this, &UMainMenu::OpenJoinMenu);
+
+	if (!ensure(QuitGameButton != nullptr)) return false;
+	QuitGameButton->Button->OnClicked.AddDynamic(this, &UMainMenu::QuitPressed);
 
 	// Join menu bindings
 	if (!ensure(JoinMenuBackButton != nullptr)) return false;
-	JoinMenuBackButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
+	JoinMenuBackButton->Button->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
 
 	if (!ensure(JoinMenuExecuteButton != nullptr)) return false;
-	JoinMenuExecuteButton->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
+	JoinMenuExecuteButton->Button->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
 
 	// Host menu bindings
 	if (!ensure(HostMenuBackButton != nullptr)) return false;
-	HostMenuBackButton->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
+	HostMenuBackButton->Button->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
 
 	if (!ensure(HostMenuExecuteButton != nullptr)) return false;
-	HostMenuExecuteButton->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
+	HostMenuExecuteButton->Button->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
 
 	return true;
 }

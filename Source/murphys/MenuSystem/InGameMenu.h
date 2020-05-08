@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "../Panels/MurphysButton.h"
 #include "InGameMenu.generated.h"
 
 /**
@@ -19,16 +20,16 @@ protected:
 private:
 	// Buttons
 	UPROPERTY(meta = (BindWidget))
-	class UButton* ResumeButton;
+	class UMurphysButton* ResumeButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* OptionsButton;
+	class UMurphysButton* OptionsButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* ExitToMainButton;
+	class UMurphysButton* ExitToMainButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* OptionsBackButton;
+	class UMurphysButton* OptionsBackButton;
 
 	//Menu Switcher
 	UPROPERTY(meta = (BindWidget))
@@ -42,9 +43,7 @@ private:
 	class UWidget* InGameOptionsMenu;
 
 	// callback funtions
-	UFUNCTION()
-	void ExitToMain();
-
+	// Exit to main menu will be handled in the blueprint
 	UFUNCTION()
 	void BackToInGameMenu();
 
