@@ -24,6 +24,35 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 	if (!ensure(InGameMenuBPClass.Class != nullptr)) return;
 
 	InGameMenuClass = InGameMenuBPClass.Class;
+
+	// Get a reference to the in game menu class
+	ConstructorHelpers::FClassFinder<UUserWidget> ChatWindow(TEXT("/Game/ChatSystem/WBP_ChatWindow"));
+	if (!ensure(ChatWindow.Class != nullptr)) return;
+
+	ChatWindowClass = ChatWindow.Class;
+}
+
+// Registers the in game menu and opens the panel
+void UMurphysGameInstance::LoadChatWindow()
+{
+	// Try and create the menu and add it to the viewport
+	if (!ensure(InGameMenuClass != nullptr)) return;
+	UUserWidget* ChatWindow = CreateWidget<UUserWidget>(this, ChatWindowClass);
+
+	if (!ensure(ChatWindow != nullptr)) return;
+	ChatWindow->AddToViewport();
+
+	// Set input mode behaviour
+	FInputModeUIOnly InputModeData;
+	InputModeData.SetWidgetToFocus(ChatWindow->TakeWidget());
+	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+
+	APlayerController* PlayerController = GetFirstLocalPlayerController();
+	if (!ensure(PlayerController != nullptr)) return;
+
+	// Setup the input mode and show the curosr for the player
+	PlayerController->SetInputMode(InputModeData);
+	PlayerController->bShowMouseCursor = true;
 }
 
 // Registers the in game menu and opens the panel
