@@ -33,31 +33,6 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 }
 
 // Registers the in game menu and opens the panel
-void UMurphysGameInstance::LoadChatWindow()
-{
-	// Try and create the menu and add it to the viewport
-	if (!ensure(InGameMenuClass != nullptr)) return;
-	ChatWindow = CreateWidget<UChatWindow>(this, ChatWindowClass);
-
-	if (!ensure(ChatWindow != nullptr)) return;
-	ChatWindow->AddToViewport();
-}
-
-void UMurphysGameInstance::SetChatActive()
-{
-	if (!ensure(ChatWindow != nullptr)) return;
-
-	ChatWindow->SetActive();
-}
-
-void UMurphysGameInstance::SetChatNotActive()
-{
-	if (!ensure(ChatWindow != nullptr)) return;
-
-	ChatWindow->SetNotActive();
-}
-
-// Registers the in game menu and opens the panel
 void UMurphysGameInstance::LoadInGameMenu()
 {
 	// Try and create the menu and add it to the viewport
@@ -290,7 +265,7 @@ void UMurphysGameInstance::OnFindSessionComplete(bool Success) {
 		}
 		else
 		{
-			Data.Name = "No name set";
+			continue;
 		}
 
 		// Add the data 

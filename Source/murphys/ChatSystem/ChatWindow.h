@@ -10,6 +10,7 @@
 #include "../Panels/MurphysButton.h"
 #include "Components/ScrollBox.h"
 #include "Components/SizeBox.h"
+#include "Components/BackgroundBlur.h"
 #include "MessageRow.h"
 #include "MessagePart.h"
 #include "MessageFormat.h"
@@ -37,19 +38,27 @@ class MURPHYS_API UChatWindow : public UUserWidget
 	TSubclassOf<class UUserWidget> MessagePartClass;
 	MessageFormat* Formats;
 
+	void SetChatActive();
+	void SetChatNotActive();
+
 public: 
 	UChatWindow(const FObjectInitializer& ObjectInitializer);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool IsActive = false;
 
 	bool Initialize();
 
 	UFUNCTION(BlueprintCallable)
-	void AddMessage();
+	void SubmitAddMessage();
 
-	void SetActive();
+	UFUNCTION(BlueprintCallable)
+	void AddMessage(FString Sender, FString Message);
 
-	void SetNotActive();
+	UFUNCTION(Exec)
+	void ToggleChatActive();
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UMurphysTextbox* MessageEntry;
 
 	UPROPERTY(meta = (BindWidget))
@@ -60,4 +69,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class USizeBox* NewMessageContainer;
+
+	UPROPERTY(meta = (BindWidget))
+	class UBackgroundBlur* Blur;
 };

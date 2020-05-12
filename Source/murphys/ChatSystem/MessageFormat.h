@@ -3,7 +3,6 @@
 
 #include "CoreMinimal.h"
 #include "MessagePart.h"
-#include "Styling/SlateColor.h"
 #include <vector>
 #include <map>
 
@@ -19,6 +18,6 @@ class MURPHYS_API MessageFormat
 public:
 	MessageFormat();
 
-	void Translate(FString Format, UMessagePart* Row);
+	void Translate(FString Format, UMessagePart* RowPart);
 	bool IsValidFormat(FString Format);
 };

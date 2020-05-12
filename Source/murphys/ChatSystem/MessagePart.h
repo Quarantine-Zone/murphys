@@ -16,8 +16,11 @@ class MURPHYS_API UMessagePart : public UUserWidget
 	GENERATED_BODY()
 
 public:
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
     class UTextBlock* Text;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    bool UseRainbow = false;
 
     void SetText(FString NewText);
 };

@@ -60,15 +60,6 @@ public:
 	UFUNCTION(Exec)
 	void LoadInGameMenu();
 
-	UFUNCTION(Exec)
-	void LoadChatWindow();
-
-	UFUNCTION(Exec)
-	void SetChatActive();
-
-	UFUNCTION(Exec)
-	void SetChatNotActive();
-
 	void RefreshServerList();
 	
 	void Init();

@@ -34,10 +34,6 @@ bool UChatWindow::Initialize()
 {
 	bool Success = Super::Initialize();
 	if (!Success) return false;
-
-	// Ensure properties exist
-	if (!ensure(MessageEntry != nullptr)) return false;
-	if (!ensure(Submit != nullptr)) return false;
 	
 	return true;
 }
@@ -76,6 +72,11 @@ std::vector<FChatMessagePart> UChatWindow::ParseMessage(FString Message)
 		// Split the string based on the first found space
 		FString FullString = AllSplitFormats[i].TrimStartAndEnd();
 		uint32 FirstSpace = FullString.Find(TEXT(" "));
+
+		if (FullString.Equals(""))
+		{
+			continue;
+		}
 
 		FString Left = ""; // the format
 		FString Right = FullString; // the remaining string
@@ -122,20 +123,15 @@ std::vector<FChatMessagePart> UChatWindow::ParseMessage(FString Message)
 }
 
 // Called from the blueprint to add a message
-void UChatWindow::AddMessage()
+// Flow: Blueprint enter & verification -> distribute to all players -> actor function calls addmessage
+void UChatWindow::SubmitAddMessage()
 {
+	// Get the text
 	FText Text = MessageEntry->Textbox->Text;
 
-	// Grab the world
+	// Get the world
 	UWorld* World = this->GetWorld();
 	if (!ensure(World != nullptr)) return;
-
-	// Get the formatted parts
-	std::vector<FChatMessagePart> Parts = ParseMessage(Text.ToString());
-
-	// Create a row
-	UMessageRow* Row = CreateWidget<UMessageRow>(World, MessageRowClass);
-	if (!ensure(Row != nullptr)) return;
 
 	// Get the player's nickname
 	ULocalPlayer* Player = GetOwningLocalPlayer();
@@ -149,8 +145,31 @@ void UChatWindow::AddMessage()
 
 	FString Nick = State->GetPlayerName();
 
+	// Add the message!
+	AddMessage(Nick, Text.ToString());
+}
+
+// Add a message based with sender and parsable text
+void UChatWindow::AddMessage(FString Sender, FString Message)
+{
+	if (Message.IsEmpty())
+	{
+		return;
+	}
+
+	// Grab the world
+	UWorld* World = this->GetWorld();
+	if (!ensure(World != nullptr)) return;
+
+	// Get the formatted parts
+	std::vector<FChatMessagePart> Parts = ParseMessage(Message);
+
+	// Create a row
+	UMessageRow* Row = CreateWidget<UMessageRow>(World, MessageRowClass);
+	if (!ensure(Row != nullptr)) return;
+
 	// Populate the name on the row
-	Row->SetSenderName(Nick);
+	Row->SetSenderName(Sender);
 
 	// Populate each row part
 	for (int i = 0; i < Parts.size(); i++) {
@@ -178,14 +197,29 @@ void UChatWindow::AddMessage()
 	MessageList->ScrollToEnd();
 }
 
-void UChatWindow::SetActive()
+// Toggle the chat as active and inactive
+void UChatWindow::ToggleChatActive()
 {
+	if (IsActive)
+	{
+		SetChatNotActive();
+	} 
+	else
+	{
+		SetChatActive();
+	}
+}
+
+// Set the chat as the active item in the viewport
+void UChatWindow::SetChatActive()
+{
+	Blur->SetVisibility(ESlateVisibility::Visible);
 	NewMessageContainer->SetVisibility(ESlateVisibility::Visible);
 	MessageList->SetScrollBarVisibility(ESlateVisibility::Visible);
 
 	// Set input mode behaviour
 	FInputModeUIOnly InputModeData;
-	InputModeData.SetWidgetToFocus(MessageEntry->TakeWidget());
+	InputModeData.SetWidgetToFocus(MessageEntry->Textbox->TakeWidget());
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	
 	ULocalPlayer* Player = GetOwningLocalPlayer();
@@ -201,10 +235,14 @@ void UChatWindow::SetActive()
 	// Setup the input mode and show the curosr for the player
 	PlayerController->SetInputMode(InputModeData);
 	PlayerController->bShowMouseCursor = true;
+
+	IsActive = true;
 }
 
-void UChatWindow::SetNotActive()
+// Set the chat as inactive in the viewport
+void UChatWindow::SetChatNotActive()
 {
+	Blur->SetVisibility(ESlateVisibility::Hidden);
 	NewMessageContainer->SetVisibility(ESlateVisibility::Hidden);
 	MessageList->SetScrollBarVisibility(ESlateVisibility::Collapsed);
 
@@ -224,4 +262,6 @@ void UChatWindow::SetNotActive()
 	// Setup the input mode and show the curosr for the player
 	PlayerController->SetInputMode(InputModeData);
 	PlayerController->bShowMouseCursor = false;
+
+	IsActive = false;
 }

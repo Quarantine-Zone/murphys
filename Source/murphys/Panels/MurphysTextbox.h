@@ -16,6 +16,6 @@ class MURPHYS_API UMurphysTextbox : public UUserWidget
 	GENERATED_BODY()
 
 public: 
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
     class UEditableTextBox* Textbox;
 };
