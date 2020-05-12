@@ -3,10 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "vector"
+#include <vector>
+
 #include "Blueprint/UserWidget.h"
 #include "../Panels/MurphysTextbox.h"
 #include "../Panels/MurphysButton.h"
+#include "Components/ScrollBox.h"
+#include "Components/SizeBox.h"
+#include "MessageRow.h"
+#include "MessagePart.h"
+#include "MessageFormat.h"
 #include "ChatWindow.generated.h"
 
 USTRUCT()
@@ -27,24 +33,31 @@ class MURPHYS_API UChatWindow : public UUserWidget
 	GENERATED_BODY()
 
 	std::vector<FChatMessagePart> ParseMessage(FString Message);
+	TSubclassOf<class UUserWidget> MessageRowClass;
+	TSubclassOf<class UUserWidget> MessagePartClass;
+	MessageFormat* Formats;
 
 public: 
 	UChatWindow(const FObjectInitializer& ObjectInitializer);
 
 	bool Initialize();
 
-	void addMessage(FText Message);
+	UFUNCTION(BlueprintCallable)
+	void AddMessage();
 
-	
-	UFUNCTION()
-	void SubmitMessage();
+	void SetActive();
 
-	UFUNCTION()
-	void TextCommitted(const FText& InText, ETextCommit::Type InCommitType);
+	void SetNotActive();
 
 	UPROPERTY(meta = (BindWidget))
 	class UMurphysTextbox* MessageEntry;
 
 	UPROPERTY(meta = (BindWidget))
 	class UMurphysButton* Submit;
+
+	UPROPERTY(meta = (BindWidget))
+	class UScrollBox* MessageList;
+
+	UPROPERTY(meta = (BindWidget))
+	class USizeBox* NewMessageContainer;
 };

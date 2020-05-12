@@ -26,10 +26,10 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 	InGameMenuClass = InGameMenuBPClass.Class;
 
 	// Get a reference to the in game menu class
-	ConstructorHelpers::FClassFinder<UUserWidget> ChatWindow(TEXT("/Game/ChatSystem/WBP_ChatWindow"));
-	if (!ensure(ChatWindow.Class != nullptr)) return;
+	ConstructorHelpers::FClassFinder<UUserWidget> ChatWindowBPClass(TEXT("/Game/ChatSystem/WBP_ChatWindow"));
+	if (!ensure(ChatWindowBPClass.Class != nullptr)) return;
 
-	ChatWindowClass = ChatWindow.Class;
+	ChatWindowClass = ChatWindowBPClass.Class;
 }
 
 // Registers the in game menu and opens the panel
@@ -37,22 +37,24 @@ void UMurphysGameInstance::LoadChatWindow()
 {
 	// Try and create the menu and add it to the viewport
 	if (!ensure(InGameMenuClass != nullptr)) return;
-	UUserWidget* ChatWindow = CreateWidget<UUserWidget>(this, ChatWindowClass);
+	ChatWindow = CreateWidget<UChatWindow>(this, ChatWindowClass);
 
 	if (!ensure(ChatWindow != nullptr)) return;
 	ChatWindow->AddToViewport();
+}
 
-	// Set input mode behaviour
-	FInputModeUIOnly InputModeData;
-	InputModeData.SetWidgetToFocus(ChatWindow->TakeWidget());
-	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+void UMurphysGameInstance::SetChatActive()
+{
+	if (!ensure(ChatWindow != nullptr)) return;
 
-	APlayerController* PlayerController = GetFirstLocalPlayerController();
-	if (!ensure(PlayerController != nullptr)) return;
+	ChatWindow->SetActive();
+}
 
-	// Setup the input mode and show the curosr for the player
-	PlayerController->SetInputMode(InputModeData);
-	PlayerController->bShowMouseCursor = true;
+void UMurphysGameInstance::SetChatNotActive()
+{
+	if (!ensure(ChatWindow != nullptr)) return;
+
+	ChatWindow->SetNotActive();
 }
 
 // Registers the in game menu and opens the panel

@@ -7,6 +7,7 @@
 #include "Public/Interfaces/OnlineSessionInterface.h"
 #include "Engine/GameInstance.h"
 #include "Blueprint/UserWidget.h"
+#include "ChatSystem/ChatWindow.h"
 #include "MurphysGameInstance.generated.h"
 
 USTRUCT()
@@ -42,6 +43,7 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 	TSubclassOf<class UUserWidget> ChatWindowClass;
 
 	class UMainMenu* Menu;
+	class UChatWindow* ChatWindow;
 
 public:
 	UMurphysGameInstance(const FObjectInitializer& ObjectInitializer);
@@ -60,6 +62,12 @@ public:
 
 	UFUNCTION(Exec)
 	void LoadChatWindow();
+
+	UFUNCTION(Exec)
+	void SetChatActive();
+
+	UFUNCTION(Exec)
+	void SetChatNotActive();
 
 	void RefreshServerList();
 	
