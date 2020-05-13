@@ -210,12 +210,23 @@ void UChatWindow::ToggleChatActive()
 	}
 }
 
+bool UChatWindow::IsChatActive()
+{
+	return IsActive;
+}
+
 // Set the chat as the active item in the viewport
 void UChatWindow::SetChatActive()
 {
 	Blur->SetVisibility(ESlateVisibility::Visible);
 	NewMessageContainer->SetVisibility(ESlateVisibility::Visible);
 	MessageList->SetScrollBarVisibility(ESlateVisibility::Visible);
+
+	// TODO: Come up with a better way than looping everytime
+	TArray<UWidget*> Children = MessageList->GetAllChildren();
+	for (UWidget* Child : Children) {
+		Child->SetVisibility(ESlateVisibility::Visible);
+	}
 
 	// Set input mode behaviour
 	FInputModeUIOnly InputModeData;
@@ -245,6 +256,12 @@ void UChatWindow::SetChatNotActive()
 	Blur->SetVisibility(ESlateVisibility::Hidden);
 	NewMessageContainer->SetVisibility(ESlateVisibility::Hidden);
 	MessageList->SetScrollBarVisibility(ESlateVisibility::Collapsed);
+
+	// TODO: Come up with a better way than looping everytime
+	TArray<UWidget*> Children = MessageList->GetAllChildren();
+	for (UWidget* Child : Children) {
+		Child->SetVisibility(ESlateVisibility::Hidden);
+	}
 
 	// Set input mode behaviour
 	FInputModeGameOnly InputModeData;

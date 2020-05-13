@@ -16,6 +16,8 @@ class MURPHYS_API UBaseHUD : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(meta = (BindWidget))
+	UBaseHUD(const FObjectInitializer& ObjectInitializer);
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UChatWindow* ChatWindow;
 };

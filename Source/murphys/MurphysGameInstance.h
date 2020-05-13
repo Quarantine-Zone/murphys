@@ -57,7 +57,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LoadMainMenu();
 
-	UFUNCTION(Exec)
+	UFUNCTION(BlueprintCallable)
 	void LoadInGameMenu();
 
 	void RefreshServerList();

@@ -38,9 +38,6 @@ class MURPHYS_API UChatWindow : public UUserWidget
 	TSubclassOf<class UUserWidget> MessagePartClass;
 	MessageFormat* Formats;
 
-	void SetChatActive();
-	void SetChatNotActive();
-
 public: 
 	UChatWindow(const FObjectInitializer& ObjectInitializer);
 
@@ -55,7 +52,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddMessage(FString Sender, FString Message);
 
-	UFUNCTION(Exec)
+	UFUNCTION(BlueprintCallable)
+	void SetChatActive();
+
+	UFUNCTION(BlueprintCallable)
+	void SetChatNotActive();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsChatActive();
+
+	UFUNCTION(BlueprintCallable)
 	void ToggleChatActive();
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
