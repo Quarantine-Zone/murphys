@@ -39,6 +39,7 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 
 	TSubclassOf<class UUserWidget> MenuClass;
 	TSubclassOf<class UUserWidget> InGameMenuClass;
+	TSubclassOf<class UUserWidget> StarfighterMenuClass;
 
 	class UMainMenu* Menu;
 
@@ -56,6 +57,9 @@ public:
 
 	UFUNCTION(Exec)
 	void LoadInGameMenu();
+
+	UFUNCTION(Exec)
+	void LoadStarfighterMenu();
 
 	void RefreshServerList();
 	
