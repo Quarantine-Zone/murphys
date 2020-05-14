@@ -24,12 +24,6 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 	if (!ensure(InGameMenuBPClass.Class != nullptr)) return;
 
 	InGameMenuClass = InGameMenuBPClass.Class;
-
-	// Get a reference to the in game menu class
-	ConstructorHelpers::FClassFinder<UUserWidget> ChatWindowBPClass(TEXT("/Game/ChatSystem/WBP_ChatWindow"));
-	if (!ensure(ChatWindowBPClass.Class != nullptr)) return;
-
-	ChatWindowClass = ChatWindowBPClass.Class;
 }
 
 // Registers the in game menu and opens the panel
@@ -253,6 +247,7 @@ void UMurphysGameInstance::OnFindSessionComplete(bool Success) {
 		
 		// Construct a server data object, which will be used to populate the row
 		FServerData Data;
+		Data.Ping = SearchResult.PingInMs;
 		Data.MaxPlayers = SearchResult.Session.SessionSettings.NumPublicConnections;
 		Data.CurrentPlayers = Data.MaxPlayers - SearchResult.Session.NumOpenPublicConnections;
 		Data.HostUsername = SearchResult.Session.OwningUserName;
