@@ -52,6 +52,10 @@ void UMurphysGameInstance::LoadInGameMenu()
 // Registers the main menu
 void UMurphysGameInstance::LoadMainMenu() {
 	if (!ensure(MenuClass != nullptr)) return;
+
+	if (SessionInterface.IsValid()) {
+		DestroySession();
+	}
 	
 	// Try and create it!
 	Menu = CreateWidget<UMainMenu>(this, MenuClass);
@@ -78,6 +82,7 @@ void UMurphysGameInstance::Init() {
 			SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UMurphysGameInstance::OnDestroySessionComplete);
 			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UMurphysGameInstance::OnJoinSessionComplete);
 			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UMurphysGameInstance::OnFindSessionComplete);
+			SessionInterface->OnSessionFailureDelegates.AddUObject(this, &UMurphysGameInstance::OnSessionFailure);
 		}
 	}
 }
@@ -91,11 +96,15 @@ void UMurphysGameInstance::Host(FServerSettings Settings) {
 	}
 
 	// Create a new session if we don't have one, otherwise cleanup and create it
+	DestroySession();
+	CreateSession();
+}
+
+void UMurphysGameInstance::DestroySession()
+{
 	auto ExistingSession = SessionInterface->GetNamedSession(SESSION_NAME);
 	if (ExistingSession != nullptr) {
 		SessionInterface->DestroySession(SESSION_NAME);
-	} else {
-		CreateSession(); 
 	}
 }
 
@@ -168,9 +177,14 @@ void UMurphysGameInstance::RefreshServerList() {
 
 // Delegate callback once a session has been destroyed
 void UMurphysGameInstance::OnDestroySessionComplete(FName SessionName, bool Success) {
-	if (Success) {
-		CreateSession();
+	// Get the target player
+	APlayerController* PlayerController = GetFirstLocalPlayerController();
+	if (!ensure(PlayerController != nullptr)) {
+		return;
 	}
+
+	// Send the player!
+	PlayerController->ClientTravel("/Game/MenuSystem/MainMenu", ETravelType::TRAVEL_Absolute);
 }
 
 // Delegate once a session has been created
@@ -268,4 +282,11 @@ void UMurphysGameInstance::OnFindSessionComplete(bool Success) {
 
 	// Set the main menu's server list
 	Menu->SetServerList(ServerNames);
+}
+
+void UMurphysGameInstance::OnSessionFailure(const FUniqueNetId& ID, ESessionFailure::Type FailureType)
+{
+	if (FailureType == ESessionFailure::Type::ServiceConnectionLost) {
+		DestroySession();
+	}
 }

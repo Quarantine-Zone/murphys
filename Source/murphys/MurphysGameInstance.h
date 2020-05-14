@@ -30,6 +30,7 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 	void OnDestroySessionComplete(FName SessionName, bool Success);
 	void OnFindSessionComplete(bool Success);
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	void OnSessionFailure(const FUniqueNetId& ID, ESessionFailure::Type FailureType);
 
 	void CreateSession();
 	FServerSettings ServerSettings;
@@ -58,6 +59,7 @@ public:
 	void LoadInGameMenu();
 
 	void RefreshServerList();
+	void DestroySession();
 	
 	void Init();
 };
