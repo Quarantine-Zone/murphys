@@ -61,7 +61,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LoadInGameMenu();
 
-	UFUNCTION(Exec)
+	UFUNCTION(BluePrintCallable)
 	void LoadStarfighterMenu();
 
 	void RefreshServerList();
