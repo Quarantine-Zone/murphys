@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "Kismet/GameplayStatics.h"
 #include "StarfighterMenu.h"
 
 
@@ -41,4 +41,6 @@ void UStarfighterMenu::CloseMenu()
 void UStarfighterMenu::LoadGame()
 {
 	UE_LOG(LogTemp, Warning, TEXT("LoadGame"));
+	UGameplayStatics::OpenLevel(GetWorld(), TEXT("StarfighterLevel_01"));
+	//Content/Minigames/Starfighter/level01/
 }
