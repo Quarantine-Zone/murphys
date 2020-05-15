@@ -31,6 +31,8 @@ void UStarfighterMenu::CloseMenu()
 	APlayerController* PlayerController = World->GetFirstPlayerController();
 	if (!ensure(PlayerController != nullptr)) return;
 
+	PlayerController->SetPause(false);
+
 	FInputModeGameOnly InputModeData;
 	PlayerController->SetInputMode(InputModeData);
 
@@ -42,5 +44,4 @@ void UStarfighterMenu::LoadGame()
 {
 	UE_LOG(LogTemp, Warning, TEXT("LoadGame"));
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("StarfighterLevel_01"));
-	//Content/Minigames/Starfighter/level01/
 }
