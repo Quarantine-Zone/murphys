@@ -40,6 +40,7 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 
 	TSubclassOf<class UUserWidget> MenuClass;
 	TSubclassOf<class UUserWidget> InGameMenuClass;
+	TSubclassOf<class UUserWidget> ChatWindowClass;
 
 	class UMainMenu* Menu;
 	class UChatWindow* ChatWindow;
