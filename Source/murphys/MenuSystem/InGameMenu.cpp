@@ -52,6 +52,8 @@ void UInGameMenu::ResumeGame()
 		APlayerController* PlayerController = World->GetFirstPlayerController();
 		if (!ensure(PlayerController != nullptr)) return;
 
+		PlayerController->SetPause(false);
+
 		FInputModeGameOnly InputModeData;
 		PlayerController->SetInputMode(InputModeData);
 
