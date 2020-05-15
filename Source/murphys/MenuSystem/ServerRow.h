@@ -22,6 +22,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* PlayerCount;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Ping;
+
 	UPROPERTY(BlueprintReadOnly)
 	bool Selected = false;
 

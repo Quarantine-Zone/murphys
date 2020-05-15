@@ -2,12 +2,11 @@
 
 
 #include "MainMenu.h"
-
 #include "UObject/ConstructorHelpers.h"
-
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
-
+#include "GameFramework/PlayerState.h"
+#include <string>
 #include "ServerRow.h"
 
 // Menu constructor
@@ -43,6 +42,9 @@ bool UMainMenu::Initialize()
 	if (!ensure(JoinMenuExecuteButton != nullptr)) return false;
 	JoinMenuExecuteButton->Button->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
 
+	if (!ensure(JoinMenuRefreshButton != nullptr)) return false;
+	JoinMenuRefreshButton->Button->OnClicked.AddDynamic(this, &UMainMenu::RefreshServers);
+
 	// Host menu bindings
 	if (!ensure(HostMenuBackButton != nullptr)) return false;
 	HostMenuBackButton->Button->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
@@ -65,8 +67,24 @@ void UMainMenu::SetServerList(TArray<FServerData> ServerNames)
 	UWorld* World = this->GetWorld();
 	if (!ensure(World != nullptr)) return;
 
-	// Clear children
-	ServerList->ClearChildren();
+	uint32 ResultCount = ServerNames.Num();
+
+	FString Result = FString::Printf(TEXT("Found %d server"), ResultCount);
+	if (ResultCount > 1) {
+		Result.Append("s");
+	}
+
+	JoinMenuResultText->SetText(FText::FromString(Result));
+	JoinMenuResultText->SetVisibility(ESlateVisibility::Visible);
+
+	// If we didn't find any, just keep trying
+	if (ResultCount == 0)
+	{
+		RefreshServers();
+		return;
+	}
+
+	JoinMenuLoadingText->SetVisibility(ESlateVisibility::Hidden);
 
 	uint32 i = 0;
 	for (const FServerData& ServerData : ServerNames)
@@ -76,11 +94,12 @@ void UMainMenu::SetServerList(TArray<FServerData> ServerNames)
 		if (!ensure(Row != nullptr)) return;
 
 		// Text for NumPlayers/MaxPlayers
-		FString FractionText = FString::Printf(TEXT("%d/%d"), ServerData.CurrentPlayers, ServerData.MaxPlayers);
+		FString FractionText = FString::Printf(TEXT("%d/%d players"), ServerData.CurrentPlayers, ServerData.MaxPlayers);
 		
 		// Set the text
 		Row->ServerName->SetText(FText::FromString(ServerData.Name));
 		Row->PlayerCount->SetText(FText::FromString(FractionText));
+		Row->Ping->SetText(FText::FromString(FString::Printf(TEXT("%dms"), ServerData.Ping)));
 		Row->Setup(this, i);
 
 		i++;
@@ -124,9 +143,8 @@ void UMainMenu::HostServer()
 {
 	if (GameInstance != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("I'm gonna Wreck it!"));
 		FServerSettings ServerSettings;
-		ServerSettings.ServerName = HostServerName->Text.ToString();
+		ServerSettings.ServerName = HostServerName->Textbox->Text.ToString();
 		ServerSettings.MaxPlayers = HostNumPlayers->GetValue();
 
 		if (ServerSettings.ServerName.IsEmpty()) {
@@ -134,6 +152,7 @@ void UMainMenu::HostServer()
 		}
 
 		GameInstance->Host(ServerSettings);
+		UE_LOG(LogTemp, Warning, TEXT("I'm gonna Wreck it!"));
 	}
 }
 
@@ -156,11 +175,23 @@ void UMainMenu::OpenJoinMenu()
 
 	// Activate it and refresh the servers
 	MenuSwitcher->SetActiveWidget(JoinMenu);
+	RefreshServers();
+
+	UE_LOG(LogTemp, Warning, TEXT("Ethan is ok I guess"));
+}
+
+// Called from the main menu to refresh the server list
+void UMainMenu::RefreshServers()
+{
+	JoinMenuLoadingText->SetVisibility(ESlateVisibility::Visible);
+	JoinMenuResultText->SetVisibility(ESlateVisibility::Hidden);
+
 	if (GameInstance != nullptr) {
 		GameInstance->RefreshServerList();
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Ethan is ok I guess"));
+	// Clear children
+	ServerList->ClearChildren();
 }
 
 // Called once a user would like to join a selected server
