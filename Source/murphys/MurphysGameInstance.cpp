@@ -36,6 +36,12 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 	if (!ensure(ChatWindowBPClass.Class != nullptr)) return;
 
 	ChatWindowClass = ChatWindowBPClass.Class;
+
+	// Get a reference to the minigame menu class
+	ConstructorHelpers::FClassFinder<UUserWidget> MinigameMenuBPClass(TEXT("/Game/MenuSystem/WBP_MinigameMenu"));
+	if (!ensure(MinigameMenuBPClass.Class != nullptr)) return;
+
+	MinigameMenuClass = MinigameMenuBPClass.Class;
 }
 
 // Registers the in game menu and opens the panel
@@ -95,6 +101,29 @@ void UMurphysGameInstance::LoadStarfighterMenu()
 	PlayerController->SetInputMode(InputModeData);
 	PlayerController->bShowMouseCursor = true;
 }
+
+void UMurphysGameInstance::LoadMinigameMenu()
+{
+	// Try and create the menu and add it to the viewport
+		if (!ensure(MinigameMenuClass != nullptr)) return;
+	UUserWidget* InMinigameMenu = CreateWidget<UUserWidget>(this, MinigameMenuClass);
+
+	if (!ensure(InMinigameMenu != nullptr)) return;
+	InMinigameMenu->AddToViewport();
+
+	// Set input mode behaviour
+	FInputModeUIOnly InputModeData;
+	InputModeData.SetWidgetToFocus(InMinigameMenu->TakeWidget());
+	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+
+	APlayerController* PlayerController = GetFirstLocalPlayerController();
+	if (!ensure(PlayerController != nullptr)) return;
+
+	// Setup the input mode and show the cursor for the player
+	PlayerController->SetInputMode(InputModeData);
+	PlayerController->bShowMouseCursor = true;
+}
+
 
 // Initializes the session game instance
 void UMurphysGameInstance::Init() {

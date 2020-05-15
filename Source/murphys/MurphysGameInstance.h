@@ -40,6 +40,7 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 
 	TSubclassOf<class UUserWidget> MenuClass;
 	TSubclassOf<class UUserWidget> InGameMenuClass;
+	TSubclassOf<class UUserWidget> MinigameMenuClass;
 	TSubclassOf<class UUserWidget> StarfighterMenuClass;
 	TSubclassOf<class UUserWidget> ChatWindowClass;
 
@@ -63,6 +64,9 @@ public:
 
 	UFUNCTION(BluePrintCallable)
 	void LoadStarfighterMenu();
+
+	UFUNCTION(BlueprintCallable)
+	void LoadMinigameMenu();
 
 	void RefreshServerList();
 	
