@@ -7,6 +7,7 @@
 #include "Public/Interfaces/OnlineSessionInterface.h"
 #include "Engine/GameInstance.h"
 #include "Blueprint/UserWidget.h"
+#include "ChatSystem/ChatWindow.h"
 #include "MurphysGameInstance.generated.h"
 
 USTRUCT()
@@ -40,8 +41,10 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 	TSubclassOf<class UUserWidget> MenuClass;
 	TSubclassOf<class UUserWidget> InGameMenuClass;
 	TSubclassOf<class UUserWidget> StarfighterMenuClass;
+	TSubclassOf<class UUserWidget> ChatWindowClass;
 
 	class UMainMenu* Menu;
+	class UChatWindow* ChatWindow;
 
 public:
 	UMurphysGameInstance(const FObjectInitializer& ObjectInitializer);
@@ -55,7 +58,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LoadMainMenu();
 
-	UFUNCTION(Exec)
+	UFUNCTION(BlueprintCallable)
 	void LoadInGameMenu();
 
 	UFUNCTION(Exec)

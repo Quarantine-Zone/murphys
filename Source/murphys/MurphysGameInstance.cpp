@@ -31,6 +31,11 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 
 	StarfighterMenuClass = StarfighterMenuBPClass.Class;
 
+	// Get a reference to the in game menu class
+	ConstructorHelpers::FClassFinder<UUserWidget> ChatWindowBPClass(TEXT("/Game/ChatSystem/WBP_ChatWindow"));
+	if (!ensure(ChatWindowBPClass.Class != nullptr)) return;
+
+	ChatWindowClass = ChatWindowBPClass.Class;
 }
 
 // Registers the in game menu and opens the panel
@@ -288,7 +293,7 @@ void UMurphysGameInstance::OnFindSessionComplete(bool Success) {
 		}
 		else
 		{
-			Data.Name = "No name set";
+			continue;
 		}
 
 		// Add the data 
