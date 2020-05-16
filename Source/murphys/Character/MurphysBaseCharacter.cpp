@@ -1,6 +1,7 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "murphysCharacter.h"
+
+#include "MurphysBaseCharacter.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -9,11 +10,12 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 
-//////////////////////////////////////////////////////////////////////////
-// AmurphysCharacter
-
-AmurphysCharacter::AmurphysCharacter()
+// Sets default values
+AMurphysBaseCharacter::AMurphysBaseCharacter()
 {
+ 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -47,64 +49,65 @@ AmurphysCharacter::AmurphysCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Input
-
-void AmurphysCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+// Called to bind functionality to input
+void AMurphysBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &AmurphysCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AmurphysCharacter::MoveRight);
+	PlayerInputComponent->BindAxis("MoveForward", this, &AMurphysBaseCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &AMurphysBaseCharacter::MoveRight);
 
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("TurnRate", this, &AmurphysCharacter::TurnAtRate);
+	PlayerInputComponent->BindAxis("TurnRate", this, &AMurphysBaseCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-	PlayerInputComponent->BindAxis("LookUpRate", this, &AmurphysCharacter::LookUpAtRate);
+	PlayerInputComponent->BindAxis("LookUpRate", this, &AMurphysBaseCharacter::LookUpAtRate);
 
 	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &AmurphysCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &AmurphysCharacter::TouchStopped);
+	PlayerInputComponent->BindTouch(IE_Pressed, this, &AMurphysBaseCharacter::TouchStarted);
+	PlayerInputComponent->BindTouch(IE_Released, this, &AMurphysBaseCharacter::TouchStopped);
 
 	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AmurphysCharacter::OnResetVR);
+	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AMurphysBaseCharacter::OnResetVR);
 }
 
 
-void AmurphysCharacter::OnResetVR()
+
+void AMurphysBaseCharacter::OnResetVR()
 {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
-void AmurphysCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
+void AMurphysBaseCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
 		Jump();
 }
 
-void AmurphysCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
+void AMurphysBaseCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
 		StopJumping();
 }
 
-void AmurphysCharacter::TurnAtRate(float Rate)
+void AMurphysBaseCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AmurphysCharacter::LookUpAtRate(float Rate)
+void AMurphysBaseCharacter::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AmurphysCharacter::MoveForward(float Value)
+void AMurphysBaseCharacter::MoveForward(float Value)
 {
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
@@ -118,7 +121,7 @@ void AmurphysCharacter::MoveForward(float Value)
 	}
 }
 
-void AmurphysCharacter::MoveRight(float Value)
+void AMurphysBaseCharacter::MoveRight(float Value)
 {
 	if ( (Controller != NULL) && (Value != 0.0f) )
 	{
