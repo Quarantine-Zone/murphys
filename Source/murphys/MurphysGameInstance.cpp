@@ -207,7 +207,7 @@ void UMurphysGameInstance::OnCreateSessionComplete(FName SessionName, bool Succe
 	}
 
 	// Send the player to the lobby
-	World->ServerTravel("/Game/ThirdPersonCPP/Maps/Lobby?listen");
+	World->ServerTravel("/Game/Lobby/Map/Lobby?listen");
 }
 
 // Delegate once a user tries to join a session
