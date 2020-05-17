@@ -6,8 +6,10 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/EditableTextBox.h"
 #include "Components/Slider.h"
+#include "Components/TextBlock.h"
 #include "../MurphysGameInstance.h"
 #include "../Panels/MurphysButton.h"
+#include "../Panels/MurphysTextbox.h"
 #include "MainMenu.generated.h"
 
 USTRUCT()
@@ -19,6 +21,7 @@ struct FServerData
 	uint16 CurrentPlayers;
 	uint16 MaxPlayers;
 	FString HostUsername;
+	int32 Ping;
 };
 
 
@@ -81,9 +84,18 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UPanelWidget* ServerList;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* JoinMenuResultText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* JoinMenuLoadingText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UMurphysButton* JoinMenuRefreshButton;
+
 	// Host menu controls
 	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* HostServerName;
+	class UMurphysTextbox* HostServerName;
 
 	UPROPERTY(meta = (BindWidget))
 	class USlider* HostNumPlayers;
@@ -114,6 +126,9 @@ private:
 
 	UFUNCTION()
 	void QuitPressed();
+
+	UFUNCTION()
+	void RefreshServers();
 
 	TOptional<uint32> SelectedIndex;
 
