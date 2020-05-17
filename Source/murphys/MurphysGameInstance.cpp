@@ -29,7 +29,7 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 
 	// Initialize referances to minigame menu classes
 	BindGameMenuReferance("StarfighterMenu", TEXT("/Game/MiniGames/Starfighter/StarfighterMenu"));
-
+	
 }
 //============================================================================
 // Game Menu Bindings
@@ -43,19 +43,17 @@ void UMurphysGameInstance::BindGameMenuReferance(FName MenuName, const TCHAR *Me
 }
 
 // use this to load minigame menus
-void UMurphysGameInstance::LoadMenuByName(FName MenuName)
+bool UMurphysGameInstance::LoadMenuByName(FName MenuName)
 {
 
 	//get menu by name
-	if (!MenuClassMap.Contains(MenuName)) return;
+	if (!MenuClassMap.Contains(MenuName)) return false;
 	TSubclassOf<class UUserWidget> *NamedMenuClass = MenuClassMap.Find(MenuName);
 
-	UE_LOG(LogTemp, Warning, TEXT("check 1"));
 	// create and load menu
-	if (!ensure(NamedMenuClass != nullptr)) return;
+	if (!ensure(NamedMenuClass != nullptr)) return false;
 	UUserWidget* NamedMenu = CreateWidget<UUserWidget>(this, *NamedMenuClass);
-	UE_LOG(LogTemp, Warning, TEXT("check 2"));
-	if (!ensure(NamedMenu != nullptr)) return;
+	if (!ensure(NamedMenu != nullptr)) return false;
 	NamedMenu->AddToViewport();
 
 	// Set input mode behaviour
@@ -64,11 +62,13 @@ void UMurphysGameInstance::LoadMenuByName(FName MenuName)
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 
 	APlayerController* PlayerController = GetFirstLocalPlayerController();
-	if (!ensure(PlayerController != nullptr)) return;
+	if (!ensure(PlayerController != nullptr)) return false;
 
 	// Setup the input mode and show the cursor for the player
 	PlayerController->SetInputMode(InputModeData);
 	PlayerController->bShowMouseCursor = true;
+
+	return true;
 }
 
 //============================================================================
@@ -83,6 +83,11 @@ void UMurphysGameInstance::LoadInGameMenu()
 void UMurphysGameInstance::LoadMinigameMenu()
 {
 	LoadMenuByName("MiniGameMenu");
+}
+
+void UMurphysGameInstance::LoadStarfighterMenu()
+{
+	LoadMenuByName("StarfighterMenu");
 }
 
 // Registers the main menu

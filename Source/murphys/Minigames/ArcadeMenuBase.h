@@ -16,10 +16,12 @@ class MURPHYS_API UArcadeMenuBase : public UUserWidget
 	GENERATED_BODY()
 	
 protected:
+	
 	virtual bool Initialize();
 
-private:
-
+	UFUNCTION(BlueprintCallable)
+	void LoadGame();
+	
 	//buttons
 	UPROPERTY(meta = (BindWidget))
 	class UButton* CloseButton;
@@ -30,13 +32,10 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void CloseMenu();
 
-	UFUNCTION(BlueprintCallable)
-	void LoadGame();
-
 public:
 
-	//Referance to MiniGame Level
 	UPROPERTY(BlueprintReadWrite)
 	FName LevelName;
 
+	
 };

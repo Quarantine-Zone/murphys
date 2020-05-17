@@ -65,10 +65,13 @@ public:
 	void LoadInGameMenu();
 
 	UFUNCTION(BlueprintCallable)
-	void LoadMenuByName(FName MenuName); 
+	bool LoadMenuByName(FName MenuName); 
 
 	UFUNCTION(BlueprintCallable)
 	void LoadMinigameMenu();
+
+	UFUNCTION(Exec)
+	void LoadStarfighterMenu();
 
 	void RefreshServerList();
 	

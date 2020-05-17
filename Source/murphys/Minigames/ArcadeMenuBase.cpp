@@ -21,8 +21,6 @@ bool UArcadeMenuBase::Initialize()
 
 void UArcadeMenuBase::CloseMenu()
 {
-	UE_LOG(LogTemp, Warning, TEXT("LoadGame"));
-
 	this->RemoveFromViewport();
 
 	UWorld* World = GetWorld();
@@ -43,6 +41,5 @@ void UArcadeMenuBase::CloseMenu()
 void UArcadeMenuBase::LoadGame()
 {
 	UE_LOG(LogTemp, Warning, TEXT("LoadGame"));
-	
-	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+	UGameplayStatics::OpenLevel(GetWorld(), LevelName); 
 }
