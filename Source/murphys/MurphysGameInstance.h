@@ -40,7 +40,11 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 
 	TSubclassOf<class UUserWidget> MenuClass;
 	TSubclassOf<class UUserWidget> InGameMenuClass;
+	TSubclassOf<class UUserWidget> MinigameMenuClass;
+	TSubclassOf<class UUserWidget> StarfighterMenuClass;
 	TSubclassOf<class UUserWidget> ChatWindowClass;
+
+	TMap<FName, TSubclassOf<class UUserWidget>> MenuClassMap;
 
 	class UMainMenu* Menu;
 	class UChatWindow* ChatWindow;
@@ -60,7 +64,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LoadInGameMenu();
 
+	UFUNCTION(BlueprintCallable)
+	bool LoadMenuByName(FName MenuName); 
+
+	UFUNCTION(BlueprintCallable)
+	void LoadMinigameMenu();
+
+	UFUNCTION(Exec)
+	void LoadStarfighterMenu();
+
 	void RefreshServerList();
 	
+	void BindGameMenuReferance(FName MenuName, const TCHAR *MenuPath);
+
 	void Init();
 };

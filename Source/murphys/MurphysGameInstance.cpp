@@ -16,43 +16,78 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 	// Get a reference to the main menu class
 	ConstructorHelpers::FClassFinder<UUserWidget> MenuBPClass(TEXT("/Game/MenuSystem/WBP_MainMenu"));
 	if (!ensure(MenuBPClass.Class != nullptr)) return;
-
 	MenuClass = MenuBPClass.Class;
-
-	// Get a reference to the in game menu class
-	ConstructorHelpers::FClassFinder<UUserWidget> InGameMenuBPClass(TEXT("/Game/MenuSystem/WBP_InGameMenu"));
-	if (!ensure(InGameMenuBPClass.Class != nullptr)) return;
-
-	InGameMenuClass = InGameMenuBPClass.Class;
 
 	// Get a reference to the in game menu class
 	ConstructorHelpers::FClassFinder<UUserWidget> ChatWindowBPClass(TEXT("/Game/ChatSystem/WBP_ChatWindow"));
 	if (!ensure(ChatWindowBPClass.Class != nullptr)) return;
-
 	ChatWindowClass = ChatWindowBPClass.Class;
+
+	// Initialize In Game Pause Menus
+	BindGameMenuReferance("MiniGameMenu", TEXT("/Game/MenuSystem/WBP_MinigameMenu"));
+	BindGameMenuReferance("InGameMenu", TEXT("/Game/MenuSystem/WBP_InGameMenu"));
+
+	// Initialize referances to minigame menu classes
+	BindGameMenuReferance("StarfighterMenu", TEXT("/Game/MiniGames/Starfighter/StarfighterMenu"));
+	
+}
+//============================================================================
+// Game Menu Bindings
+//============================================================================
+void UMurphysGameInstance::BindGameMenuReferance(FName MenuName, const TCHAR *MenuPath)
+{
+	ConstructorHelpers::FClassFinder<UUserWidget> NamedMenuBPClass(MenuPath);
+	if (!ensure(NamedMenuBPClass.Class != nullptr)) return;
+	MenuClassMap.Add(MenuName, NamedMenuBPClass.Class);
+
 }
 
-// Registers the in game menu and opens the panel
-void UMurphysGameInstance::LoadInGameMenu()
+// use this to load minigame menus
+bool UMurphysGameInstance::LoadMenuByName(FName MenuName)
 {
-	// Try and create the menu and add it to the viewport
-	if (!ensure(InGameMenuClass != nullptr)) return;
-	UUserWidget* InGameMenu = CreateWidget<UUserWidget>(this, InGameMenuClass);
-	
-	if (!ensure(InGameMenu != nullptr)) return;
-	InGameMenu->AddToViewport();
+
+	//get menu by name
+	if (!MenuClassMap.Contains(MenuName)) return false;
+	TSubclassOf<class UUserWidget> *NamedMenuClass = MenuClassMap.Find(MenuName);
+
+	// create and load menu
+	if (!ensure(NamedMenuClass != nullptr)) return false;
+	UUserWidget* NamedMenu = CreateWidget<UUserWidget>(this, *NamedMenuClass);
+	if (!ensure(NamedMenu != nullptr)) return false;
+	NamedMenu->AddToViewport();
 
 	// Set input mode behaviour
 	FInputModeUIOnly InputModeData;
-	InputModeData.SetWidgetToFocus(InGameMenu->TakeWidget());
+	InputModeData.SetWidgetToFocus(NamedMenu->TakeWidget());
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 
 	APlayerController* PlayerController = GetFirstLocalPlayerController();
-	if (!ensure(PlayerController != nullptr)) return;
+	if (!ensure(PlayerController != nullptr)) return false;
 
-	// Setup the input mode and show the curosr for the player
+	// Setup the input mode and show the cursor for the player
 	PlayerController->SetInputMode(InputModeData);
 	PlayerController->bShowMouseCursor = true;
+
+	return true;
+}
+
+//============================================================================
+// Main Menu and Pause Menu Functions
+//============================================================================
+// Registers the in game menu and opens the panel
+void UMurphysGameInstance::LoadInGameMenu()
+{
+	LoadMenuByName("InGameMenu");
+}
+
+void UMurphysGameInstance::LoadMinigameMenu()
+{
+	LoadMenuByName("MiniGameMenu");
+}
+
+void UMurphysGameInstance::LoadStarfighterMenu()
+{
+	LoadMenuByName("StarfighterMenu");
 }
 
 // Registers the main menu
@@ -67,6 +102,7 @@ void UMurphysGameInstance::LoadMainMenu() {
 	Menu->Setup();
 	Menu->SetGameInstance(this);
 }
+//============================================================================
 
 // Initializes the session game instance
 void UMurphysGameInstance::Init() {
