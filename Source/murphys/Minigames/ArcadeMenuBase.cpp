@@ -2,6 +2,7 @@
 
 
 #include "ArcadeMenuBase.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
 
 bool UArcadeMenuBase::Initialize()
@@ -41,5 +42,8 @@ void UArcadeMenuBase::CloseMenu()
 void UArcadeMenuBase::LoadGame()
 {
 	UE_LOG(LogTemp, Warning, TEXT("LoadGame"));
-	UGameplayStatics::OpenLevel(GetWorld(), LevelName); 
+	
+	CloseMenu();
+	GetWorld()->ServerTravel(LevelPath);
+
 }

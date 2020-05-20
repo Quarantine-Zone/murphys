@@ -68,14 +68,14 @@ public:
 	bool LoadMenuByName(FName MenuName); 
 
 	UFUNCTION(BlueprintCallable)
-	void LoadMinigameMenu();
+	void LoadMiniGameMenu();
 
 	UFUNCTION(Exec)
 	void LoadStarfighterMenu();
 
 	void RefreshServerList();
 	
-	void BindGameMenuReferance(FName MenuName, const TCHAR *MenuPath);
+	void BindGameMenuReference(FName MenuName, const TCHAR *MenuPath);
 
 	void Init();
 };

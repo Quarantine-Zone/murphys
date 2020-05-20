@@ -40,7 +40,13 @@ private:
 	FVector velocity; // m/s
 	float SteeringThrow;
 
+	//Input Axis Mappings
 	void input_moveForward(float value);
 	void MoveRight(float Value);
 	void apply_Rotation(float DeltaTime);
+
+	//Input Action Mappings
+	//UFUNCTION(BlueprintCallable)
+	//void LoadMiniGameMenu();
+
 };

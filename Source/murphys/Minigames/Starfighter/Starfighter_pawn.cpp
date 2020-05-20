@@ -43,6 +43,9 @@ void AStarfighter_pawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis("MoveForward", this, &AStarfighter_pawn::input_moveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AStarfighter_pawn::MoveRight);
 
+	//set up pause menu
+	//PlayerInputComponent->BindAction("OpenInGameMenu", IE_Pressed, this, &AStarfighter_pawn::LoadMiniGameMenu);
+		
 }
 
 
@@ -66,3 +69,11 @@ void AStarfighter_pawn::MoveRight(float value)
 {
 	SteeringThrow = value;
 }
+
+//pause menu
+/*
+void AStarfighter_pawn::LoadMiniGameMenu()
+{
+	GetMurphysGameInstance()->LoadMiniGameMenu();
+}
+*/

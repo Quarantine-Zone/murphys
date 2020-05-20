@@ -24,17 +24,17 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 	ChatWindowClass = ChatWindowBPClass.Class;
 
 	// Initialize In Game Pause Menus
-	BindGameMenuReferance("MiniGameMenu", TEXT("/Game/MenuSystem/WBP_MinigameMenu"));
-	BindGameMenuReferance("InGameMenu", TEXT("/Game/MenuSystem/WBP_InGameMenu"));
+	BindGameMenuReference("MiniGameMenu", TEXT("/Game/MenuSystem/WBP_MinigameMenu"));
+	BindGameMenuReference("InGameMenu", TEXT("/Game/MenuSystem/WBP_InGameMenu"));
 
 	// Initialize referances to minigame menu classes
-	BindGameMenuReferance("StarfighterMenu", TEXT("/Game/MiniGames/Starfighter/StarfighterMenu"));
+	BindGameMenuReference("StarfighterMenu", TEXT("/Game/MiniGames/Starfighter/StarfighterMenu"));
 	
 }
 //============================================================================
 // Game Menu Bindings
 //============================================================================
-void UMurphysGameInstance::BindGameMenuReferance(FName MenuName, const TCHAR *MenuPath)
+void UMurphysGameInstance::BindGameMenuReference(FName MenuName, const TCHAR *MenuPath)
 {
 	ConstructorHelpers::FClassFinder<UUserWidget> NamedMenuBPClass(MenuPath);
 	if (!ensure(NamedMenuBPClass.Class != nullptr)) return;
@@ -80,7 +80,7 @@ void UMurphysGameInstance::LoadInGameMenu()
 	LoadMenuByName("InGameMenu");
 }
 
-void UMurphysGameInstance::LoadMinigameMenu()
+void UMurphysGameInstance::LoadMiniGameMenu()
 {
 	LoadMenuByName("MiniGameMenu");
 }
