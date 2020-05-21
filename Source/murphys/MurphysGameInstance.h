@@ -39,15 +39,15 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
 
 	TSubclassOf<class UUserWidget> MenuClass;
-	TSubclassOf<class UUserWidget> InGameMenuClass;
-	TSubclassOf<class UUserWidget> MinigameMenuClass;
-	TSubclassOf<class UUserWidget> StarfighterMenuClass;
 	TSubclassOf<class UUserWidget> ChatWindowClass;
+	TSubclassOf<class UUserWidget> LoadingMenuClass;
 
 	TMap<FName, TSubclassOf<class UUserWidget>> MenuClassMap;
 
 	class UMainMenu* Menu;
 	class UChatWindow* ChatWindow;
+	class ULoadingMenu* LoadingMenu;
+
 
 public:
 	UMurphysGameInstance(const FObjectInitializer& ObjectInitializer);
@@ -70,8 +70,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LoadMiniGameMenu();
 
-	UFUNCTION(Exec)
-	void LoadStarfighterMenu();
+	void BeginLoadingScreen();
+
+	void EndLoadingScreen();
 
 	void RefreshServerList();
 	

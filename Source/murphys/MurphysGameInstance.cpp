@@ -8,6 +8,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
 #include "MenuSystem/MainMenu.h"
+#include "MenuSystem/LoadingMenu.h"
 
 const static FName SESSION_NAME = TEXT("Game");
 
@@ -23,9 +24,15 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 	if (!ensure(ChatWindowBPClass.Class != nullptr)) return;
 	ChatWindowClass = ChatWindowBPClass.Class;
 
+	// get a reference to the Loading Menu class
+	ConstructorHelpers::FClassFinder<UUserWidget> LoadingMenuBPClass(TEXT("/Game/MenuSystem/WBP_LoadingMenu"));
+	if (!ensure(LoadingMenuBPClass.Class != nullptr)) return;
+	LoadingMenuClass = LoadingMenuBPClass.Class;
+
 	// Initialize In Game Pause Menus
 	BindGameMenuReference("MiniGameMenu", TEXT("/Game/MenuSystem/WBP_MinigameMenu"));
 	BindGameMenuReference("InGameMenu", TEXT("/Game/MenuSystem/WBP_InGameMenu"));
+	BindGameMenuReference("LoadingMenu", TEXT("/Game/MenuSystem/WBP_LoadingMenu"));
 
 	// Initialize referances to minigame menu classes
 	BindGameMenuReference("StarfighterMenu", TEXT("/Game/MiniGames/Starfighter/StarfighterMenu"));
@@ -85,11 +92,6 @@ void UMurphysGameInstance::LoadMiniGameMenu()
 	LoadMenuByName("MiniGameMenu");
 }
 
-void UMurphysGameInstance::LoadStarfighterMenu()
-{
-	LoadMenuByName("StarfighterMenu");
-}
-
 // Registers the main menu
 void UMurphysGameInstance::LoadMainMenu() {
 	if (!ensure(MenuClass != nullptr)) return;
@@ -103,10 +105,40 @@ void UMurphysGameInstance::LoadMainMenu() {
 	Menu->SetGameInstance(this);
 }
 //============================================================================
+// set up loading screens
+//============================================================================
+
+void UMurphysGameInstance::BeginLoadingScreen()
+{
+
+	//LoadMenuByName(TEXT("LoadingMenu"));
+	if (!ensure(LoadingMenuClass != nullptr)) return;
+
+	// remember to make a custom class
+	LoadingMenu = CreateWidget<ULoadingMenu>(this, LoadingMenuClass);
+	if (!ensure(LoadingMenu != nullptr)) return;
+
+	LoadingMenu->Setup();
+
+}
+
+void UMurphysGameInstance::EndLoadingScreen()
+{
+	// close menu
+	LoadingMenu->Teardown();
+	
+}
+
+//============================================================================
 
 // Initializes the session game instance
 void UMurphysGameInstance::Init() {
 	UE_LOG(LogTemp, Warning, TEXT("Game instance initialization"));
+
+	//set up loading screen
+	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UMurphysGameInstance::BeginLoadingScreen);
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UMurphysGameInstance::EndLoadingScreen);
+
 
 	// Get the online subsystem
 	IOnlineSubsystem* subsystem = IOnlineSubsystem::Get();
