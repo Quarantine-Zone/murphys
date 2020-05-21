@@ -22,6 +22,6 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UMurphysButton* ExitToLobbyButton;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ExitToLobby();
 };

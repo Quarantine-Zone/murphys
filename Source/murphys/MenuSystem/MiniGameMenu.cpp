@@ -2,6 +2,8 @@
 
 
 #include "MiniGameMenu.h"
+#include "Engine/Engine.h"
+
 
 
 bool UMiniGameMenu::Initialize()
@@ -18,5 +20,22 @@ bool UMiniGameMenu::Initialize()
 	
 void UMiniGameMenu::ExitToLobby()
 {
-	GetWorld()->ServerTravel(TEXT("/Game/Lobby/Map/Lobby"));
+	UWorld* World = GetWorld();
+	if (!ensure(World != nullptr)) {
+		return;
+	}
+
+	APlayerController* PlayerController = World->GetFirstPlayerController();
+	if (!ensure(PlayerController != nullptr)) return;
+
+	PlayerController->SetPause(false);
+
+	FInputModeGameOnly InputModeData;
+	PlayerController->SetInputMode(InputModeData);
+
+	PlayerController->bShowMouseCursor = false;
+
+	// Send the player to the lobby
+	ResumeGame();
+	World->ServerTravel(TEXT("/Game/Lobby/Map/Lobby"));
 }
