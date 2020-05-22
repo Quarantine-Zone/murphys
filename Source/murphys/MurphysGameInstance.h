@@ -9,6 +9,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ChatSystem/ChatWindow.h"
 #include "MenuSystem/SLoadingMenuWidget.h"
+#include "PersistenceSystem/PersistenceManager.h"
 #include "MurphysGameInstance.generated.h"
 
 
@@ -50,6 +51,8 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 
 	TSharedPtr<SLoadingMenuWidget> LoadingMenuWidget;
 	TSharedPtr<SWidget> LoadingMenuWidgetContainer;
+	
+	PersistenceManager* PersistManager;
 
 public:
 	UMurphysGameInstance(const FObjectInitializer& ObjectInitializer);
