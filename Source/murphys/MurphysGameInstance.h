@@ -8,6 +8,7 @@
 #include "Engine/GameInstance.h"
 #include "Blueprint/UserWidget.h"
 #include "ChatSystem/ChatWindow.h"
+#include "PersistenceSystem/PersistenceManager.h"
 #include "MurphysGameInstance.generated.h"
 
 USTRUCT()
@@ -48,6 +49,8 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 
 	class UMainMenu* Menu;
 	class UChatWindow* ChatWindow;
+
+	PersistenceManager* PersistManager;
 
 public:
 	UMurphysGameInstance(const FObjectInitializer& ObjectInitializer);
