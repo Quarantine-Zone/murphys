@@ -8,7 +8,10 @@
 #include "Engine/GameInstance.h"
 #include "Blueprint/UserWidget.h"
 #include "ChatSystem/ChatWindow.h"
+#include "MenuSystem/SLoadingMenuWidget.h"
 #include "MurphysGameInstance.generated.h"
+
+
 
 USTRUCT()
 struct FServerSettings
@@ -40,24 +43,30 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 
 	TSubclassOf<class UUserWidget> MenuClass;
 	TSubclassOf<class UUserWidget> ChatWindowClass;
-	TSubclassOf<class UUserWidget> LoadingMenuClass;
-
 	TMap<FName, TSubclassOf<class UUserWidget>> MenuClassMap;
 
 	class UMainMenu* Menu;
 	class UChatWindow* ChatWindow;
-	class ULoadingMenu* LoadingMenu;
 
+	TSharedPtr<SLoadingMenuWidget> LoadingMenuWidget;
+	TSharedPtr<SWidget> LoadingMenuWidgetContainer;
 
 public:
 	UMurphysGameInstance(const FObjectInitializer& ObjectInitializer);
 
+	void Init();
+	
+	//=============================================
 	UFUNCTION(Exec)
 	void Host(FServerSettings ServerSettings);
 
 	UFUNCTION(Exec)
 	void Join(uint32 Index);
 
+	void RefreshServerList();
+
+	//=============================================
+	// Menu Functions
 	UFUNCTION(BlueprintCallable)
 	void LoadMainMenu();
 
@@ -70,13 +79,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LoadMiniGameMenu();
 
-	void BeginLoadingScreen();
-
-	void EndLoadingScreen();
-
-	void RefreshServerList();
-	
 	void BindGameMenuReference(FName MenuName, const TCHAR *MenuPath);
+	//===============================================================
+	// Loading Screen 
+	UFUNCTION()
+	virtual void BeginLoadingScreen(const FString &MapName);
+	UFUNCTION()
+	virtual void EndLoadingScreen(UWorld* InLoadedWorld);
 
-	void Init();
+	UFUNCTION(Exec)
+	void StartLoadingMenuTest();
+
+	UFUNCTION(Exec)
+	void EndLoadingMenuTest();
+
+	//============================================================
 };

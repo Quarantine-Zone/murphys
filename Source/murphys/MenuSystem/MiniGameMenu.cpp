@@ -37,5 +37,5 @@ void UMiniGameMenu::ExitToLobby()
 
 	// Send the player to the lobby
 	ResumeGame();
-	World->ServerTravel(TEXT("/Game/Lobby/Map/Lobby"));
+	World->ServerTravel("/Game/Lobby/Map/Lobby");
 }

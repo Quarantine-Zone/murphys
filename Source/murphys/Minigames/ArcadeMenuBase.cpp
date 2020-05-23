@@ -4,6 +4,7 @@
 #include "ArcadeMenuBase.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "../MurphysGameInstance.h"
 
 bool UArcadeMenuBase::Initialize()
 {
@@ -40,10 +41,21 @@ void UArcadeMenuBase::CloseMenu()
 }
 
 void UArcadeMenuBase::LoadGame()
-{
-	UE_LOG(LogTemp, Warning, TEXT("LoadGame"));
-	
+{	
+	UWorld* World = GetWorld();
+	if (!ensure(World != nullptr)) return;
+
 	CloseMenu();
-	GetWorld()->ServerTravel(LevelPath);
+	if (World->GetFirstPlayerController()->HasAuthority())
+	{
+		//UMurphysGameInstance *MyGI = (UMurphysGameInstance *) GetGameInstance();
+		//MyGI->BeginLoadingScreen();
+		World->ServerTravel(LevelPath);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("cannot choose gamemode when not host"));
+	}
+	
 
 }

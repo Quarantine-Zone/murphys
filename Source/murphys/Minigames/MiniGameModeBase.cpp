@@ -2,7 +2,7 @@
 
 
 #include "MiniGameModeBase.h"
-
+/*
 //==============================================================
 // game state handling
 //==============================================================
@@ -23,11 +23,13 @@ void AMiniGameModeBase::EndGame()
 //=============================================================
 void AMiniGameModeBase::PreLogin(APlayerController *NewPlayer)
 {
-
+	//Super::PreLogin();
 }
 
 void AMiniGameModeBase::PostLogin(APlayerController *NewPlayer)
 {
+	Super::PostLogin(NewPlayer);
+
 	if (MatchInProgress) {
 		// join as spectator
 		//BecomeSpectator(NewPlayer);
@@ -39,5 +41,6 @@ void AMiniGameModeBase::PostLogin(APlayerController *NewPlayer)
 
 void AMiniGameModeBase::Logout(AController *Exiting)
 {
-	
+	Super::Logout(Exiting);
 }
+*/
