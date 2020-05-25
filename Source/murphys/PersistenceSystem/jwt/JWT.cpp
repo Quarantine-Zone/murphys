@@ -21,14 +21,9 @@
 #include "Json.h"
 
 // Constructor which requires a key to be used in hashing
-JWT::JWT(FString KeyWhenHashing)
+void JWT::SetKey(FString KeyWhenHashing)
 {
 	HashKey = KeyWhenHashing;
-}
-
-JWT::~JWT()
-{
-
 }
 
 // Encodes a string to base64

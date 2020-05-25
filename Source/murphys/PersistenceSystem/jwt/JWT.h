@@ -23,8 +23,7 @@ class MURPHYS_API JWT
 	void AsJsonString(FJsonObject* Target, FString* Output);
 
 public:
-	JWT(FString KeyWhenHashing);
-	~JWT();
+	void SetKey(FString KeyToUse);
 	
 	FString GenerateToken(FJsonObject* Payload);
 	void GetPayload(FString Token, FJsonObject* OutObject);

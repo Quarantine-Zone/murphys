@@ -95,15 +95,11 @@ void UMurphysGameInstance::LoadMainMenu() {
 	Menu = CreateWidget<UMainMenu>(this, MenuClass);
 	if (!ensure(Menu != nullptr)) return;
 
-	// Remove the peristence manager if we were hosting a game
-	if (PersistManager)
-	{
-		delete PersistManager;
-	}
-
 	// Set it up
 	Menu->Setup();
 	Menu->SetGameInstance(this);
+
+	UnLoadPersistenceManager();
 }
 //============================================================================
 // set up loading screens
@@ -195,8 +191,6 @@ void UMurphysGameInstance::CreateSession() {
 		return;
 	}
 
-	PersistManager = new PersistenceManager();
-
 	// Construct the session settings based on those provided by the user
 	FOnlineSessionSettings SessionSettings;
 	if (IOnlineSubsystem::Get()->GetSubsystemName() == "NULL")
@@ -240,6 +234,27 @@ void UMurphysGameInstance::Join(uint32 Index) {
 	// Do the join!
 	SessionInterface->JoinSession(0, SESSION_NAME, SessionSearch->SearchResults[Index]);
 }
+
+void UMurphysGameInstance::LoadPersistenceManager()
+{
+	PersistManager = NewObject<UPersistenceManager>();
+
+	PersistManager->Init();
+}
+
+void UMurphysGameInstance::UnLoadPersistenceManager()
+{
+	if (PersistManager)
+	{
+		PersistManager->MarkPendingKill();
+	}
+}
+
+UPersistenceManager* UMurphysGameInstance::GetPersistenceManager()
+{
+	return PersistManager;
+}
+
 
 // Refresh the servers on the main menu
 void UMurphysGameInstance::RefreshServerList() {
@@ -361,3 +376,4 @@ void UMurphysGameInstance::OnFindSessionComplete(bool Success) {
 	// Set the main menu's server list
 	Menu->SetServerList(ServerNames);
 }
+

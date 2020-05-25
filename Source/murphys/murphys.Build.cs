@@ -19,7 +19,7 @@ public class murphys : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "OnlineSubsystem", "OnlineSubsystemUtils", "OnlineSubsystemSteam", "Slate", "SlateCore", "MoviePlayer", "Json"});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "OnlineSubsystem", "OnlineSubsystemUtils", "OnlineSubsystemSteam", "Slate", "SlateCore", "MoviePlayer", "Json", "Steamworks", "HTTP"});
 
         LoadOpenSSL(Target);
     }

@@ -1,50 +1,45 @@
 #include "PersistenceManager.h"
-#include "HttpModule.h"
+#include <fstream>
+#include <string>
+#include <sstream>
+#include "HTTP/Public/HttpModule.h"
 
-PersistenceManager::PersistenceManager()
+void UPersistenceManager::Init()
 {
-	// TODO: Load key 
-	// Instantiate JWT instance
-	TokenHandler = new JWT(FString(""));
-
-	DataCache["users"] = new FJsonObject;
-}
-
-PersistenceManager::~PersistenceManager()
-{
-	// Free up resources
-	if (TokenHandler)
+	std::ifstream infile("persistence_key.txt");
+	if (infile.good())
 	{
-		delete TokenHandler;
-	}
+		std::string line;
+		std::getline(infile, line);
 
-	// Delete all references to existing objects
-	for (TPair<FString, FJsonObject*> Pair : DataCache)
+		TokenHandler.SetKey(FString(line.c_str()));
+
+		FJsonObject Users;
+		DataCache["users"] = Users;
+	} 
+	else
 	{
-		delete Pair.Value;
-		Pair.Value = nullptr;
+		UE_LOG(LogTemp, Warning, TEXT("Couldn't load persistence API secret!"));
 	}
-
-	DataCache.Empty();
 }
 
 // Initiated internally to create an HTTP request
-void PersistenceManager::HTTPRequest(FString Endpoint, FString RequestType, FJsonObject* Payload)
+void UPersistenceManager::HTTPRequest(FString Endpoint, FString RequestType, FJsonObject* Payload)
 {
 	// Generate a new token with the payload
-	FString Token = TokenHandler->GenerateToken(Payload);
+	FString Token = TokenHandler.GenerateToken(Payload);
 
 	// Create and process the request!
 	TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
 	Request->SetVerb(RequestType);
 	Request->SetURL(Endpoint);
 	Request->SetHeader("Authorization", "Bearer" + Token);
-	Request->OnProcessRequestComplete().BindUObject(this, &PersistenceManager::HTTPRequestCompleteInternal);
+	Request->OnProcessRequestComplete().BindUObject(this, &UPersistenceManager::HTTPRequestCompleteInternal);
 	Request->ProcessRequest();
 }
 
 // Called when an HTTP request has completed
-void PersistenceManager::HTTPRequestCompleteInternal(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+void UPersistenceManager::HTTPRequestCompleteInternal(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
 	// #Rip
 	if (!bWasSuccessful)
@@ -56,7 +51,7 @@ void PersistenceManager::HTTPRequestCompleteInternal(FHttpRequestPtr Request, FH
 	FString ResponseStr = Response->GetContentAsString();
 	FJsonObject Content;
 
-	TokenHandler->AsJsonObject(ResponseStr, &Content);
+	TokenHandler.AsJsonObject(ResponseStr, &Content);
 
 	// The API will always send either a state == success or failed
 	if (Content.GetStringField(FString("state")) == FString("failed"))
@@ -70,7 +65,7 @@ void PersistenceManager::HTTPRequestCompleteInternal(FHttpRequestPtr Request, FH
 	FString Token = Content.GetStringField("result");
 	FJsonObject Payload;
 
-	TokenHandler->GetPayload(Token, &Payload);
+	TokenHandler.GetPayload(Token, &Payload);
 
 	TSharedPtr<FJsonObject> PayloadSharable = MakeShareable(&Payload);
 
@@ -81,19 +76,15 @@ void PersistenceManager::HTTPRequestCompleteInternal(FHttpRequestPtr Request, FH
 	// Call appropriate internal handler
 	if (*Scope == FString("get_user"))
 	{
-		LoadUserDataByIDCompleteInternal(&PayloadSharable);
+		LoadUserDataByIDCompleteInternal(&PayloadSharable, true);
 	}
 	else if (*Scope == FString("update_user"))
 	{
-		UpdateUserDataByIDCompleteInternal(&PayloadSharable);
+		UpdateUserDataByIDCompleteInternal(&PayloadSharable, true);
 	}
 }
 
-
-
-
-
-void PersistenceManager::LoadUserDataByID(FString UserID)
+void UPersistenceManager::LoadUserDataByID(FString UserID)
 {
 	FJsonObject Payload;
 	Payload.SetStringField("uid", UserID);
@@ -101,11 +92,10 @@ void PersistenceManager::LoadUserDataByID(FString UserID)
 	HTTPRequest("https://quarantine-zone-dive.herokuapp.com/user", "GET", &Payload);
 }
 
-
-void PersistenceManager::LoadUserDataByIDCompleteInternal(TSharedPtr<FJsonObject>* Result)
+void UPersistenceManager::LoadUserDataByIDCompleteInternal(TSharedPtr<FJsonObject>* Result, bool Success)
 {
 	// Find returns a reference to the object (in our case already a pointer)
-	FJsonObject* Users = *DataCache.Find("users");
+	FJsonObject* Users = DataCache.Find("users");
 	if (!Users || !Result->Get()) return;
 
 	// Get the uid
@@ -117,13 +107,19 @@ void PersistenceManager::LoadUserDataByIDCompleteInternal(TSharedPtr<FJsonObject
 	OnLoadUserDataByIDCompleteDelegate.ExecuteIfBound(uid, *Result->Get());
 }
 
-void PersistenceManager::UpdateUserDataByIDCompleteInternal(TSharedPtr<FJsonObject>* Result)
+void UPersistenceManager::UpdateUserDataByIDCompleteInternal(TSharedPtr<FJsonObject>* Result, bool Success)
 {
 
 }
 
-
-FJsonObject PersistenceManager::GetUserDataByID(FString UserID)
+void UPersistenceManager::UpdateUserDataByID(FString UserID)
 {
 
+}
+
+FJsonObject UPersistenceManager::GetUserDataByID(FString UserID)
+{
+	FJsonObject obj;
+
+	return obj;
 }

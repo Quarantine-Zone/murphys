@@ -46,6 +46,8 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 	TSubclassOf<class UUserWidget> ChatWindowClass;
 	TMap<FName, TSubclassOf<class UUserWidget>> MenuClassMap;
 
+	UPersistenceManager* PersistManager;
+
 	class UMainMenu* Menu;
 	class UChatWindow* ChatWindow;
 
@@ -95,6 +97,19 @@ public:
 
 	UFUNCTION(Exec)
 	void EndLoadingMenuTest();
+	
+	UFUNCTION(BlueprintCallable)
+	void LoadPersistenceManager();
+
+	UFUNCTION(BlueprintCallable)
+	void UnLoadPersistenceManager();
+
+	UFUNCTION(BlueprintPure)
+	UPersistenceManager* GetPersistenceManager();
+
+	void RefreshServerList();
+	
+	void BindGameMenuReferance(FName MenuName, const TCHAR *MenuPath);
 
 	//============================================================
 };
