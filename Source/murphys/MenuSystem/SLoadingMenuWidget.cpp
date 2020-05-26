@@ -31,7 +31,7 @@ void SLoadingMenuWidget::Construct(const FArguments &InArgs)
 
 	const FMargin ContentPadding = FMargin(20.f);
 
-	FSlateFontInfo PromptTextStyle = FCoreStyle::Get().GetFontStyle("EmbossedText");
+	FSlateFontInfo PromptTextStyle = FCoreStyle::Get().GetFontStyle("TitleText");
 	PromptTextStyle.Size = 40.0f;
 
 	FSlateFontInfo MessageTextStyle = PromptTextStyle;
@@ -64,7 +64,7 @@ void SLoadingMenuWidget::Construct(const FArguments &InArgs)
 				.VAlign(VAlign_Fill)
 				[
 					SNew(SImage)
-					.ColorAndOpacity(FColor::FromHex("000000AA"))
+					.ColorAndOpacity(FColor::FromHex("000000CC"))
 				]
 				+ SOverlay::Slot()
 				.HAlign(HAlign_Fill)
@@ -73,11 +73,16 @@ void SLoadingMenuWidget::Construct(const FArguments &InArgs)
 				[
 					SNew(SVerticalBox)
 					+ SVerticalBox::Slot()
-					.Padding(FMargin(0.f, 20.f))
+					.FillHeight(1.7)
+					.VAlign(VAlign_Center)
+					.Padding(FMargin(0.f, 5.f))
 					[
-						SNew(STextBlock)
-						.Font(PromptTextStyle)
-						.Text(LoadingPrompt)
+						SNew(SBox)
+						[
+							SNew(STextBlock)
+							.Font(PromptTextStyle)
+							.Text(LoadingPrompt)
+						]
 					]
 					+ SVerticalBox::Slot()
 					[
