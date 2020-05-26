@@ -2,7 +2,7 @@
 
 
 #include "MiniGameModeBase.h"
-/*
+
 //==============================================================
 // game state handling
 //==============================================================
@@ -21,6 +21,8 @@ void AMiniGameModeBase::EndGame()
 //=============================================================
 // player session handling
 //=============================================================
+
+
 void AMiniGameModeBase::PreLogin(APlayerController *NewPlayer)
 {
 	//Super::PreLogin();
@@ -43,4 +45,3 @@ void AMiniGameModeBase::Logout(AController *Exiting)
 {
 	Super::Logout(Exiting);
 }
-*/

@@ -146,8 +146,6 @@ void UMurphysGameInstance::Init() {
 	UE_LOG(LogTemp, Warning, TEXT("Game instance initialization"));
 
 	//set up loading screen UMurphysGameInstance
-	//FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UMurphysGameInstance::BeginLoadingScreen);
-	//::PostLoadMapWithWorld.AddUObject(this, &UMurphysGameInstance::EndLoadingScreen);
 	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UMurphysGameInstance::BeginLoadingScreen);
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UMurphysGameInstance::EndLoadingScreen);
 

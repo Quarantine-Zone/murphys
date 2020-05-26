@@ -14,7 +14,7 @@ class MURPHYS_API AMiniGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
-/*
+
 private:
 
 	bool MatchInProgress; // is there a game in progress?
@@ -30,5 +30,5 @@ public:
 	void StartGame();
 
 	void EndGame();
-*/
+
 };

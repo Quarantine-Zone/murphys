@@ -25,6 +25,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(BlueprintReadWrite)
+	FVector2D SteeringVectorUI;
+
 private:
 
 	//=====================================================================
@@ -66,7 +69,7 @@ private:
 	//
 	// this subsystem is intended to make piloting in combat easier, 
 	// and can be easily turned on and off by the ship's pilot
-
+	
 
 	//====================================================================
 
@@ -82,8 +85,11 @@ private:
 	void input_SetRoll(float value);
 	void input_SetYaw(float value);
 
-	void getMouseRotation();
+	void UpdateSteeringVector();
+	//=========================
+	//void getCursorTraceHitLocation(FVector &Location);
 
+	//========================
 	//Input Action Mappings
 	//UFUNCTION(BlueprintCallable)
 	//void LoadMiniGameMenu();

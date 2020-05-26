@@ -35,10 +35,5 @@ protected:
 public:
 
 	UPROPERTY(BlueprintReadWrite)
-	FString LevelPath;
-
-	UPROPERTY(BlueprintReadWrite)
-	FName LevelName;
-
-	
+	FString LevelPath;	
 };

@@ -37,7 +37,6 @@ void UArcadeMenuBase::CloseMenu()
 	PlayerController->SetInputMode(InputModeData);
 
 	PlayerController->bShowMouseCursor = false;
-
 }
 
 void UArcadeMenuBase::LoadGame()

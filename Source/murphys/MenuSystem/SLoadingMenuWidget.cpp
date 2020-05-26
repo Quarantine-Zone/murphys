@@ -27,8 +27,6 @@ void SLoadingMenuWidget::Construct(const FArguments &InArgs)
 	int i = rand() % MessageListLen;
 	
 	const FText LoadingPrompt = LOCTEXT("LoadingPromt", "Loading...");
-	//const FText LoadingMessage = FText::FromString(MessageList[i]);
-	//const FText LoadingMessage = LOCTEXT("LoadingMessage", "Here's something interesting to read while you wait");
 	const FText LoadingMessage = FText::FromString(MessageList[i]);
 
 	const FMargin ContentPadding = FMargin(20.f);
