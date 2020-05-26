@@ -21,11 +21,9 @@ private:
 
 public:
 	
-	void PreLogin(APlayerController *NewPlayer); //override;
+	void PostLogin(APlayerController *NewPlayer) override;
 
-	void PostLogin(APlayerController *NewPlayer); //override;
-
-	void Logout(AController *Exiting); //override;
+	void Logout(AController *Exiting) override;
 
 	void StartGame();
 

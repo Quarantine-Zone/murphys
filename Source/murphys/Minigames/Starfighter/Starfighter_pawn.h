@@ -25,6 +25,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//Used by the HUD to Animate the targeting reticle 
 	UPROPERTY(BlueprintReadWrite)
 	FVector2D SteeringVectorUI;
 

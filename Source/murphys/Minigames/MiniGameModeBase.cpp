@@ -23,15 +23,10 @@ void AMiniGameModeBase::EndGame()
 //=============================================================
 
 
-void AMiniGameModeBase::PreLogin(APlayerController *NewPlayer)
-{
-	//Super::PreLogin();
-}
-
 void AMiniGameModeBase::PostLogin(APlayerController *NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-
+	//WIP
 	if (MatchInProgress) {
 		// join as spectator
 		//BecomeSpectator(NewPlayer);
@@ -44,4 +39,11 @@ void AMiniGameModeBase::PostLogin(APlayerController *NewPlayer)
 void AMiniGameModeBase::Logout(AController *Exiting)
 {
 	Super::Logout(Exiting);
+	//WIP
+	if (MatchInProgress) {
+		// update game status
+	}
+	else {
+		// update teams
+	}
 }

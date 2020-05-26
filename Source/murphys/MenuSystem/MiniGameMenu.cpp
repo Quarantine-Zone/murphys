@@ -3,8 +3,6 @@
 
 #include "MiniGameMenu.h"
 #include "Engine/Engine.h"
-#include "../Minigames/Starfighter/StarfighterHUD.h"
-
 
 
 bool UMiniGameMenu::Initialize()
@@ -28,10 +26,6 @@ void UMiniGameMenu::ExitToLobby()
 
 	APlayerController* PlayerController = World->GetFirstPlayerController();
 	if (!ensure(PlayerController != nullptr)) return;
-
-	
-	//AStarfighterHUD* SF_HUD =  (AStarfighterHUD*) PlayerController->GetHUD();
-	//SF_HUD->CleanHUD();
 
 	PlayerController->SetPause(false);
 
