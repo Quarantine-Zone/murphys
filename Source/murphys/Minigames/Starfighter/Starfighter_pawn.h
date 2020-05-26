@@ -30,7 +30,8 @@ public:
 	FVector2D SteeringVectorUI;
 
 private:
-
+	//=====================================================================
+	bool ShowDebugInfo = true;
 	//=====================================================================
 	// Ship Control Inputs
 	//=====================================================================
@@ -73,26 +74,30 @@ private:
 	
 
 	//====================================================================
-
-
 	// pysics simulation functions
 	void apply_Rotation(float DeltaTime);
 	void apply_internal_forces(float DeltaTime);
 
-
+	//=====================================================================
 	//Input Axis Mappings
-	void input_SetThrottle(float value);
-	void input_SetPitch(float value);
-	void input_SetRoll(float value);
-	void input_SetYaw(float value);
+		void input_SetThrottle(float value);
+		void input_SetPitch(float value);
+		void input_SetRoll(float value);
+		void input_SetYaw(float value);
+	//Server Input Replication
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetThrottle(float value);
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetPitch(float value);
 
-	void UpdateSteeringVector();
-	//=========================
-	//void getCursorTraceHitLocation(FVector &Location);
-
-	//========================
-	//Input Action Mappings
-	//UFUNCTION(BlueprintCallable)
-	//void LoadMiniGameMenu();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetRoll(float value);
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetYaw(float value);
+	//=====================================================================
+	// Debug Helpers
+	FString GetEnumText(ENetRole Role);
 
 };

@@ -3,20 +3,19 @@
 
 #include "Starfighter_pawn.h"
 #include "StarfighterPlayerController.h" 
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 AStarfighter_pawn::AStarfighter_pawn()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
 void AStarfighter_pawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -32,6 +31,11 @@ void AStarfighter_pawn::Tick(float DeltaTime)
 	FVector translation = Velocity * DeltaTime * 100;
 	AddActorWorldOffset(translation);
 
+	if (ShowDebugInfo) 
+	{
+		DrawDebugString(GetWorld(), FVector(0, 0, 100), GetEnumText(Role), this, FColor::White, DeltaTime);
+	}
+
 }
 
 // Called to bind functionality to input
@@ -43,9 +47,6 @@ void AStarfighter_pawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis("MoveRight", this, &AStarfighter_pawn::input_SetRoll);
 	PlayerInputComponent->BindAxis("Turn", this, &AStarfighter_pawn::input_SetYaw);
 	PlayerInputComponent->BindAxis("LookUp", this, &AStarfighter_pawn::input_SetPitch);
-
-	//set up pause menu
-	//PlayerInputComponent->BindAction("OpenInGameMenu", IE_Pressed, this, &AStarfighter_pawn::LoadMiniGameMenu);
 		
 }
 
@@ -56,26 +57,20 @@ void AStarfighter_pawn::apply_Rotation(float DeltaTime)
 	// ship mass also affects a ship's rotation speed
 	// in adition to its acceleration.
 
-
-	//UpdateSteeringVector();
-	
-	//UE_LOG(LogTemp, Warning, TEXT("Pitch= %f, Yaw=%f"), pitch, yaw);
-
 	//compress axis value using a sigmoid function
 	float compressed_yaw   = 2 * ((1 / (1 + exp(-1 * yaw))) - 0.5);
 	float compressed_pitch = 2 * ((1 / (1 + exp(-1 * pitch))) - 0.5);
 
-	UE_LOG(LogTemp, Warning, TEXT("Compressed Pitch= %f, Compressed Yaw=%f"), compressed_pitch, compressed_yaw);
+	//UE_LOG(LogTemp, Warning, TEXT("Compressed Pitch= %f, Compressed Yaw=%f"), compressed_pitch, compressed_yaw);
 	
-	float s = 70.0;
-	SteeringVectorUI = FVector2D(compressed_yaw*s, compressed_pitch*s);
+	float scale_factor = 70.0;
+	SteeringVectorUI = FVector2D(compressed_yaw*scale_factor, compressed_pitch*scale_factor);
 
 	// Apply Rotation to Ship
 	
 	float rotX = MaxRotation * DeltaTime * compressed_yaw;
 	float rotY = MaxRotation * DeltaTime * compressed_pitch;
 	float rotZ = MaxRotation * DeltaTime * roll;
-
 
 	FQuat RotationX(GetActorUpVector(), FMath::DegreesToRadians(rotX));
 	AddActorWorldRotation(RotationX);
@@ -112,59 +107,90 @@ void AStarfighter_pawn::apply_internal_forces(float DeltaTime)
 	}
 	GetController();
 }
-
+//========================================================================
 //player input functions
+//========================================================================
+// Client Input Functions
 void AStarfighter_pawn::input_SetThrottle(float value)
 {
 	throttle = value;
+	Server_SetThrottle(value);
+}
+
+void AStarfighter_pawn::input_SetPitch(float value)
+{
+	pitch += value;
+	Server_SetPitch(value);
 }
 
 void AStarfighter_pawn::input_SetRoll(float value)
 {
-	
 	roll = value;
+	Server_SetRoll(value);
 }
 
 void AStarfighter_pawn::input_SetYaw(float value)
 {
 	yaw += value;
-	//if (yaw < .2 && yaw > -.2) yaw = 0;
-
+	Server_SetYaw(value);
 }
 
-void AStarfighter_pawn::input_SetPitch(float value)
+// Server Replication Functions
+bool AStarfighter_pawn::Server_SetThrottle_Validate(float value)
 {
-	
+	return (value >= -1 && value <= 1);
+}
+
+void AStarfighter_pawn::Server_SetThrottle_Implementation(float value)
+{
+	throttle = value;
+}
+
+bool AStarfighter_pawn::Server_SetRoll_Validate(float value)
+{
+	return (value >= -1 && value <= 1);
+}
+
+void AStarfighter_pawn::Server_SetRoll_Implementation(float value)
+{
+	roll = value;
+}
+
+bool AStarfighter_pawn::Server_SetYaw_Validate(float value)
+{
+	return (value >= -1 && value <= 1);
+}
+
+void AStarfighter_pawn::Server_SetYaw_Implementation(float value)
+{
+	yaw += value;
+}
+
+bool AStarfighter_pawn::Server_SetPitch_Validate(float value)
+{
+	return (value >= -1 && value <= 1);
+}
+
+void AStarfighter_pawn::Server_SetPitch_Implementation(float value)
+{
 	pitch += value;
-	//if (pitch < .2 && pitch > -.2) pitch = 0;
-
 }
-
-void AStarfighter_pawn::UpdateSteeringVector()
+//==============================================================================
+//debug helpers
+//==============================================================================
+FString AStarfighter_pawn::GetEnumText(ENetRole netRole)
 {
-	/*
-	UWorld *world = GetWorld(); 
-	if (!ensure(world != nullptr)) return;
-	AStarfighterPlayerController* SF_player = (AStarfighterPlayerController*) world->GetFirstPlayerController();
-
-	FVector2D SteeringVector = SF_player->GetSteeringVector();
-
-	float x = SteeringVector.X;
-	float y = SteeringVector.Y;
-
-	//SteeringVector.GetSafeNormal();
-
-	float sigmoid_X = 1 / (1 + exp(-1 * x));
-	float sigmoid_Y = 1 / (1 + exp(-1 * y));
-
-
-
-	yaw = sigmoid_X;
-	pitch = sigmoid_Y;
-	*/
-
-	//=========================================
-
-
+	switch (netRole)
+	{
+	case ROLE_None:
+		return "None";
+	case ROLE_SimulatedProxy:
+		return "SimulatedProxy";
+	case ROLE_AutonomousProxy:
+		return "AutonomousProxy";
+	case ROLE_Authority:
+		return "Authority";
+	default:
+		return "ERROR";
+	}
 }
-
