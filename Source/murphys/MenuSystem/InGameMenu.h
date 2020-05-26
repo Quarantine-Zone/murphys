@@ -49,7 +49,7 @@ protected:
 	UFUNCTION()
 	void OpenOptionsMenu();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ResumeGame();
 
 };
