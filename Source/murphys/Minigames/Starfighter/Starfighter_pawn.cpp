@@ -47,7 +47,15 @@ void AStarfighter_pawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis("MoveRight", this, &AStarfighter_pawn::input_SetRoll);
 	PlayerInputComponent->BindAxis("Turn", this, &AStarfighter_pawn::input_SetYaw);
 	PlayerInputComponent->BindAxis("LookUp", this, &AStarfighter_pawn::input_SetPitch);
-		
+	// implement controller  joystick support
+
+	// Action Mappings TBD
+
+	//InertialDamper On/Off
+	//Engine On/Off
+	//Beam Hook On/Off
+	//Fire Lasers
+
 }
 
 // rotates the ship based on control input

@@ -4,7 +4,6 @@
 #include "StarfighterPlayerController.h"
 
 
-
 FVector2D AStarfighterPlayerController::GetSteeringVector()
 {
 	int32 ViewportSizeX, ViewportSizeY;
@@ -20,3 +19,10 @@ FVector2D AStarfighterPlayerController::GetSteeringVector()
 	return SteeringVector;
 
 }
+
+/*
+void AStarfighterPlayerController::Server_TeamSelected(APlayerController* player, TeamEnum team)
+{
+	
+}
+*/

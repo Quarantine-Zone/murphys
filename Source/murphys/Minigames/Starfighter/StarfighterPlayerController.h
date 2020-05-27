@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+enum TeamEnum;
+
 UCLASS()
 class MURPHYS_API AStarfighterPlayerController : public APlayerController
 {
@@ -23,8 +26,15 @@ private:
 	UPROPERTY(EditAnywhere)
 	float CrosshairYLocation = .4;
 
+//	UPROPERTY(BlueprintReadWrite)
+//	TeamEnum team;
+
 public:
 
 	FVector2D GetSteeringVector();
+
+	//UFUNCTION(Server, Reliable)
+	//void Server_TeamSelected(APlayerController* player, TeamEnum team);
+	
 
 };
