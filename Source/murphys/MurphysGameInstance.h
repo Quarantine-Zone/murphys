@@ -54,8 +54,6 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 	TSharedPtr<SLoadingMenuWidget> LoadingMenuWidget;
 	TSharedPtr<SWidget> LoadingMenuWidgetContainer;
 	
-	PersistenceManager* PersistManager;
-
 public:
 	UMurphysGameInstance(const FObjectInitializer& ObjectInitializer);
 
@@ -98,6 +96,10 @@ public:
 	UFUNCTION(Exec)
 	void EndLoadingMenuTest();
 	
+	void BindGameMenuReferance(FName MenuName, const TCHAR *MenuPath);
+
+	//============================================================
+
 	UFUNCTION(BlueprintCallable)
 	void LoadPersistenceManager();
 
@@ -106,10 +108,4 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UPersistenceManager* GetPersistenceManager();
-
-	void RefreshServerList();
-	
-	void BindGameMenuReferance(FName MenuName, const TCHAR *MenuPath);
-
-	//============================================================
 };
