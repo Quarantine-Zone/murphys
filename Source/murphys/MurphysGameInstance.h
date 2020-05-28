@@ -8,7 +8,10 @@
 #include "Engine/GameInstance.h"
 #include "Blueprint/UserWidget.h"
 #include "ChatSystem/ChatWindow.h"
+#include "MenuSystem/SLoadingMenuWidget.h"
 #include "MurphysGameInstance.generated.h"
+
+
 
 USTRUCT()
 struct FServerSettings
@@ -39,25 +42,31 @@ class MURPHYS_API UMurphysGameInstance : public UGameInstance {
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
 
 	TSubclassOf<class UUserWidget> MenuClass;
-	TSubclassOf<class UUserWidget> InGameMenuClass;
-	TSubclassOf<class UUserWidget> MinigameMenuClass;
-	TSubclassOf<class UUserWidget> StarfighterMenuClass;
 	TSubclassOf<class UUserWidget> ChatWindowClass;
-
 	TMap<FName, TSubclassOf<class UUserWidget>> MenuClassMap;
 
 	class UMainMenu* Menu;
 	class UChatWindow* ChatWindow;
 
+	TSharedPtr<SLoadingMenuWidget> LoadingMenuWidget;
+	TSharedPtr<SWidget> LoadingMenuWidgetContainer;
+
 public:
 	UMurphysGameInstance(const FObjectInitializer& ObjectInitializer);
 
+	void Init();
+	
+	//=============================================
 	UFUNCTION(Exec)
 	void Host(FServerSettings ServerSettings);
 
 	UFUNCTION(Exec)
 	void Join(uint32 Index);
 
+	void RefreshServerList();
+
+	//=============================================
+	// Menu Functions
 	UFUNCTION(BlueprintCallable)
 	void LoadMainMenu();
 
@@ -68,14 +77,21 @@ public:
 	bool LoadMenuByName(FName MenuName); 
 
 	UFUNCTION(BlueprintCallable)
-	void LoadMinigameMenu();
+	void LoadMiniGameMenu();
+
+	void BindGameMenuReference(FName MenuName, const TCHAR *MenuPath);
+	//===============================================================
+	// Loading Screen 
+	UFUNCTION()
+	virtual void BeginLoadingScreen(const FString &MapName);
+	UFUNCTION()
+	virtual void EndLoadingScreen(UWorld* InLoadedWorld);
 
 	UFUNCTION(Exec)
-	void LoadStarfighterMenu();
+	void StartLoadingMenuTest();
 
-	void RefreshServerList();
-	
-	void BindGameMenuReferance(FName MenuName, const TCHAR *MenuPath);
+	UFUNCTION(Exec)
+	void EndLoadingMenuTest();
 
-	void Init();
+	//============================================================
 };

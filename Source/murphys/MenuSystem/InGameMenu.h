@@ -17,7 +17,6 @@ class MURPHYS_API UInGameMenu : public UUserWidget
 protected:
 	virtual bool Initialize();
 
-private:
 	// Buttons
 	UPROPERTY(meta = (BindWidget))
 	class UMurphysButton* ResumeButton;
@@ -50,7 +49,7 @@ private:
 	UFUNCTION()
 	void OpenOptionsMenu();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ResumeGame();
 
 };

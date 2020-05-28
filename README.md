@@ -12,6 +12,22 @@ Once you've pulled the repo, do the following.
 # Using Frameworks
 
 ## Minigame
+
+To add a Minigame:
+
+1) Create a new folder for the game in the minigames folder. (you can organize the content inside however you want)
+2) Create a new level for the minigame
+3) Create a userwidget blueprint for the game's arcade menu
+4) Open the widget and do the following:
+    - Go to the Class Details tab and set the parent class to ArcadeMenuBase
+    - Add the blueprint node "event On Initialized"
+    - From the new node add a "Set Level Path" node and asign it the value of the path to the new level for the minigame
+    - Name the button that will launch the minigame "PlayButton" and name the button that will close the menu "CloseMenuButton". The ArcadeMenuBase class will bind these automatically to the correct functions.
+5) Place a new instance of the Arcade Machine Blueprint into the lobby.
+    - set the Menu Name variable on the arcade machine to the name of the menu widget for the minigame.
+6) Inherrit your gamemode from MiniGameModeBase
+
+
 ## Scoreboard
 
 

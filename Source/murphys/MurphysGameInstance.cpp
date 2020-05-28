@@ -8,6 +8,8 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
 #include "MenuSystem/MainMenu.h"
+#include "MoviePlayer.h"
+#include "MenuSystem/SLoadingMenuWidget.h"
 
 const static FName SESSION_NAME = TEXT("Game");
 
@@ -24,17 +26,17 @@ UMurphysGameInstance::UMurphysGameInstance(const FObjectInitializer& ObjectIniti
 	ChatWindowClass = ChatWindowBPClass.Class;
 
 	// Initialize In Game Pause Menus
-	BindGameMenuReferance("MiniGameMenu", TEXT("/Game/MenuSystem/WBP_MinigameMenu"));
-	BindGameMenuReferance("InGameMenu", TEXT("/Game/MenuSystem/WBP_InGameMenu"));
+	BindGameMenuReference("MiniGameMenu", TEXT("/Game/MenuSystem/WBP_MinigameMenu"));
+	BindGameMenuReference("InGameMenu", TEXT("/Game/MenuSystem/WBP_InGameMenu"));
 
 	// Initialize referances to minigame menu classes
-	BindGameMenuReferance("StarfighterMenu", TEXT("/Game/MiniGames/Starfighter/StarfighterMenu"));
+	BindGameMenuReference("StarfighterMenu", TEXT("/Game/MiniGames/Starfighter/StarfighterMenu"));
 	
 }
 //============================================================================
 // Game Menu Bindings
 //============================================================================
-void UMurphysGameInstance::BindGameMenuReferance(FName MenuName, const TCHAR *MenuPath)
+void UMurphysGameInstance::BindGameMenuReference(FName MenuName, const TCHAR *MenuPath)
 {
 	ConstructorHelpers::FClassFinder<UUserWidget> NamedMenuBPClass(MenuPath);
 	if (!ensure(NamedMenuBPClass.Class != nullptr)) return;
@@ -80,14 +82,9 @@ void UMurphysGameInstance::LoadInGameMenu()
 	LoadMenuByName("InGameMenu");
 }
 
-void UMurphysGameInstance::LoadMinigameMenu()
+void UMurphysGameInstance::LoadMiniGameMenu()
 {
 	LoadMenuByName("MiniGameMenu");
-}
-
-void UMurphysGameInstance::LoadStarfighterMenu()
-{
-	LoadMenuByName("StarfighterMenu");
 }
 
 // Registers the main menu
@@ -103,10 +100,54 @@ void UMurphysGameInstance::LoadMainMenu() {
 	Menu->SetGameInstance(this);
 }
 //============================================================================
+// set up loading screens
+//============================================================================
+
+void UMurphysGameInstance::BeginLoadingScreen(const FString &InMapName)
+{	
+	LoadingMenuWidget = SNew(SLoadingMenuWidget);
+
+	if (!IsRunningDedicatedServer())
+	{
+		FLoadingScreenAttributes LoadingScreen;
+		LoadingScreen.bAutoCompleteWhenLoadingCompletes = false;
+		LoadingScreen.WidgetLoadingScreen = SAssignNew(LoadingMenuWidgetContainer, SWeakWidget).PossiblyNullContent(LoadingMenuWidget.ToSharedRef());
+		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
+	}
+	
+}
+
+void UMurphysGameInstance::EndLoadingScreen(UWorld* InLoadedWorld)
+{
+	// add additional loading behavior here
+	return;
+}
+
+// Displays loading menu widget (For Testing Only)
+void UMurphysGameInstance::StartLoadingMenuTest()
+{
+	LoadingMenuWidget = SNew(SLoadingMenuWidget);
+	GEngine->GameViewport->AddViewportWidgetContent(SAssignNew(LoadingMenuWidgetContainer, SWeakWidget).PossiblyNullContent(LoadingMenuWidget.ToSharedRef()));
+}
+
+// Removes loading Menu widget (For Testing Only)
+void UMurphysGameInstance::EndLoadingMenuTest()
+{
+	if (GEngine && GEngine->GameViewport && LoadingMenuWidgetContainer.IsValid())
+	{
+		GEngine->GameViewport->RemoveViewportWidgetContent(LoadingMenuWidgetContainer.ToSharedRef());
+	}
+}
+
+//============================================================================
 
 // Initializes the session game instance
 void UMurphysGameInstance::Init() {
 	UE_LOG(LogTemp, Warning, TEXT("Game instance initialization"));
+
+	//set up loading screen UMurphysGameInstance
+	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UMurphysGameInstance::BeginLoadingScreen);
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UMurphysGameInstance::EndLoadingScreen);
 
 	// Get the online subsystem
 	IOnlineSubsystem* subsystem = IOnlineSubsystem::Get();
