@@ -95,6 +95,12 @@ void UMurphysGameInstance::LoadMainMenu() {
 	Menu = CreateWidget<UMainMenu>(this, MenuClass);
 	if (!ensure(Menu != nullptr)) return;
 
+	// Remove the peristence manager if we were hosting a game
+	if (PersistManager)
+	{
+		delete PersistManager;
+	}
+
 	// Set it up
 	Menu->Setup();
 	Menu->SetGameInstance(this);
@@ -190,6 +196,8 @@ void UMurphysGameInstance::CreateSession() {
 	if (!SessionInterface.IsValid()) {
 		return;
 	}
+
+	PersistManager = new PersistenceManager();
 
 	// Construct the session settings based on those provided by the user
 	FOnlineSessionSettings SessionSettings;

@@ -12,7 +12,6 @@
 #include <openssl/pem.h>
 #include <openssl/ec.h>
 #include <openssl/ossl_typ.h>
-
 #include <string>
 
 #include "Containers/UnrealString.h"
