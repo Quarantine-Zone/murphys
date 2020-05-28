@@ -2,6 +2,7 @@
 
 
 #include "Starfighter_pawn.h"
+#include "Projectile.h"
 #include "StarfighterPlayerController.h" 
 #include "DrawDebugHelpers.h"
 
@@ -16,20 +17,42 @@ AStarfighter_pawn::AStarfighter_pawn()
 void AStarfighter_pawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	LastFiredTime = GetWorld()->GetTimeSeconds();
 }
+
+void AStarfighter_pawn::SetFighterMeshReference(UStaticMeshComponent* FighterMeshReference)
+{
+	FighterMesh = FighterMeshReference;
+}
+
 
 // Called every frame
 void AStarfighter_pawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	apply_Rotation(DeltaTime);
-	
+
 	apply_internal_forces(DeltaTime);
 
 	// move fighter according to velocity
 	FVector translation = Velocity * DeltaTime * 100;
 	AddActorWorldOffset(translation);
+
+	//Handle weapons systems
+	
+	//
+
+	if (MainWeaponEnabled)
+	{
+		auto time = GetWorld()->GetTimeSeconds();
+		if (time - LastFiredTime > MainWeaponFireRate) 
+		{
+			FireMainWeapon();
+			LastFiredTime = time;
+		}
+	}
 
 	if (ShowDebugInfo) 
 	{
@@ -55,6 +78,8 @@ void AStarfighter_pawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	//Engine On/Off
 	//Beam Hook On/Off
 	//Fire Lasers
+	PlayerInputComponent->BindAction("ActionLMB", IE_Pressed, this, &AStarfighter_pawn::input_Activate_MainWeapon);
+	PlayerInputComponent->BindAction("ActionLMB", IE_Released, this, &AStarfighter_pawn::input_Deactivate_MainWeapon);
 
 }
 
@@ -114,6 +139,29 @@ void AStarfighter_pawn::apply_internal_forces(float DeltaTime)
 		Velocity += DeltaTime * InertialDamperStrength * DampingVector;
 	}
 	GetController();
+}
+
+void AStarfighter_pawn::FireMainWeapon()
+{
+	
+
+	FName SocketName;
+	if (LeftFiredLast)
+	{
+		SocketName = FName("RightLaserSocket");
+		LeftFiredLast = false;
+	}
+	else
+	{
+		SocketName = FName("LeftLaserSocket");
+		LeftFiredLast = true;
+	}
+
+	
+	AProjectile* Proj = GetWorld()->SpawnActor<AProjectile>(MainWeaponProjectileBlueprint,
+								   FighterMesh->GetSocketLocation(SocketName),
+								   FighterMesh->GetSocketRotation(SocketName));
+	Proj->LaunchProjectile();
 }
 //========================================================================
 //player input functions
@@ -182,6 +230,31 @@ bool AStarfighter_pawn::Server_SetPitch_Validate(float value)
 void AStarfighter_pawn::Server_SetPitch_Implementation(float value)
 {
 	pitch += value;
+}
+//=============================================================================
+//Input Action Functions
+//=============================================================================
+void AStarfighter_pawn::input_Activate_MainWeapon()
+{
+	MainWeaponEnabled = true;
+	Server_Toggle_MainWeapon(true);
+}
+
+void AStarfighter_pawn::input_Deactivate_MainWeapon()
+{
+	MainWeaponEnabled = false;
+	Server_Toggle_MainWeapon(false);
+}
+
+// server replication
+bool AStarfighter_pawn::Server_Toggle_MainWeapon_Validate(bool enabled)
+{
+	return true;
+}
+
+void AStarfighter_pawn::Server_Toggle_MainWeapon_Implementation(bool enabled)
+{
+	MainWeaponEnabled = enabled;
 }
 //==============================================================================
 //debug helpers
