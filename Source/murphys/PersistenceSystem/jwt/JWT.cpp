@@ -4,14 +4,15 @@
 #include "Serialization/JsonWriter.h"
 #include "Serialization/JsonSerializer.h"
 
+#include "Policies/CondensedJsonPrintPolicy.h"
+
 #include <openssl/sha.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 #include <openssl/pem.h>
 #include <openssl/ec.h>
 #include <openssl/ossl_typ.h>
-#include <iomanip>
-#include <sstream>
+
 #include <string>
 
 #include "Containers/UnrealString.h"
@@ -29,12 +30,17 @@ void JWT::SetKey(FString KeyWhenHashing)
 // Encodes a string to base64
 FString JWT::Encode64(FString Data)
 {
-	return FBase64::Encode(Data);
+	FString Encoded = FBase64::Encode(Data);
+	Encoded = Encoded.Replace(TEXT("+"), TEXT("-")).Replace(TEXT("/"), TEXT("_")).Replace(TEXT("="), TEXT(""));
+
+	return Encoded;
 }
 
 // Decodes a string from base64
 FString JWT::Decode64(FString Data)
 {
+	Data = Data.Replace(TEXT("-"), TEXT("+")).Replace(TEXT("_"), TEXT("/"));
+
 	FString Decoded;
 	FBase64::Decode(Data, Decoded);
 
@@ -60,73 +66,80 @@ FString JWT::Hash(FString TargetString)
 	std::string targetAsStr(TCHAR_TO_UTF8(*TargetString));
 	std::string keyAsStr(TCHAR_TO_UTF8(*HashKey));
 
-	// Cast the target string to an unsigned char*
-	const unsigned char* targetAsCStr = reinterpret_cast<const unsigned char*>(targetAsStr.c_str());
-
 	// Create a new buffer for the output hash
-	unsigned char outputHash[EVP_MAX_MD_SIZE];
+	unsigned char outputHash[64];
 	unsigned int HmacLen;
 
 	// Create a new HMAC instance
 	HMAC_CTX *Hmac = HMAC_CTX_new();
-	HMAC_Init_ex(Hmac, keyAsStr.c_str(), keyAsStr.length(), EVP_sha256(), NULL);
+	HMAC_Init_ex(Hmac, &keyAsStr[0], keyAsStr.length(), EVP_sha256(), NULL);
 
 	// Set the HMAC instance with the target
-	HMAC_Update(Hmac, targetAsCStr, targetAsStr.size());
+	HMAC_Update(Hmac, (unsigned char*)&targetAsStr[0], targetAsStr.length());
 
 	// Execute the hash
 	HMAC_Final(Hmac, outputHash, &HmacLen);
-
-	// Create a string representation from the char buffer
-	std::stringstream ss;
+	
+	// Create a string representation from the char buffer	
+	// This took me way too long to realize I needed to convert this to base 64
+	TArray<uint8> HashAsBytes;
 	for (unsigned int i = 0; i < HmacLen; i++)
 	{
-		ss << std::hex << std::setw(2) << std::setfill('0') << (int)outputHash[i];
+		// Convert the character array to a byte array
+		HashAsBytes.Add((uint8)outputHash[i]);
 	}
+
+	// Convert the entire array of bytes to a base64 string
+	// Note: FString doesn't like non-printable characters, so we have to encode it separately (from our normal strings) here AND make it url safe
+	FString Encoded = FBase64::Encode(HashAsBytes).Replace(TEXT("+"), TEXT("-")).Replace(TEXT("/"), TEXT("_")).Replace(TEXT("="), TEXT(""));
 
 	// Free the HMAC instance
 	HMAC_CTX_free(Hmac);
 
 	// Return an FString representation
-	return FString(ss.str().c_str());
+	return Encoded;
 }
 
 // Returns the FString representation of an FJsonObject
-void JWT::AsJsonString(FJsonObject* Target, FString* Output)
+FString JWT::AsJsonString(TSharedPtr<FJsonObject> Target)
 {
 	// Create a new reference target and writer
-	TSharedPtr<FJsonObject> TargetRef = MakeShareable(&*Target);
-	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(Output);
+	FString Output;
+
+	TSharedRef< TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>> > Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR> >::Create(&Output);
 
 	// Serialize the object to the string!
-	FJsonSerializer::Serialize(TargetRef.ToSharedRef(), Writer);
+	FJsonSerializer::Serialize(Target.ToSharedRef(), Writer);
+	
+	return Output;
 }
 
 // Generates a JWT to be used in POST requests to the persistence API
-FString JWT::GenerateToken(FJsonObject* Payload)
+FString JWT::GenerateToken(TSharedPtr<FJsonObject> Payload)
 {
 	// Construct the header
-	FJsonObject Header;
-	Header.SetStringField("typ", "JWT");
-	Header.SetStringField("alg", "HS256");
+	TSharedPtr<FJsonObject> Header = MakeShareable(new FJsonObject);
+	Header->SetStringField("typ", "JWT");
+	Header->SetStringField("alg", "HS256");
 
 	// Convert the header and payload to FStrings
-	FString HeaderAsString;
-	FString PayloadAsString;
-
-	AsJsonString(&Header, &HeaderAsString);
-	AsJsonString(Payload, &PayloadAsString);
+	FString HeaderAsString = AsJsonString(Header);
+	FString PayloadAsString = AsJsonString(Payload);
 
 	// Encode the header strings in base64
 	FString HeaderEnc = Encode64(HeaderAsString);
 	FString PayloadEnc = Encode64(PayloadAsString);
 
+	FString Sign = HeaderEnc + "." + PayloadEnc;
+
 	// Create the token signature
-	FString Sign = HeaderEnc.Append(".").Append(PayloadEnc);
+	// Note: Already returned in base 64 (dealing with bytes, FString doesn't like non-printable characters)
 	FString HashedSign = Hash(Sign);
 
-	// Return the full token
-	return HeaderEnc.Append(".").Append(PayloadEnc).Append(".").Append(Sign);
+	FString Token = HeaderEnc + "." + PayloadEnc + "." + HashedSign;
+
+	// Set the output as the token value
+	return Token;
 }
 
 // Returns whether a token is valid based on it's provided signature
@@ -145,7 +158,7 @@ bool JWT::IsTokenValid(FString Token)
 	// Assign all the parts
 	FString Header = TokenParts[0];
 	FString Payload = TokenParts[1];
-	FString ActualSign = Decode64(TokenParts[2]);
+	FString ActualSign = TokenParts[2];
 
 	// Create a new signature from the header and payload
 	FString CheckSign = Hash(Header.Append(".").Append(Payload));
@@ -156,7 +169,7 @@ bool JWT::IsTokenValid(FString Token)
 
 // Gets the FJsonObject passed in a JWT
 // Does not perform validation - make sure to do this first!
-void JWT::GetPayload(FString Token, FJsonObject* OutObject)
+void JWT::GetPayload(FString Token, TSharedPtr<FJsonObject>* OutObject)
 {
 	// Split the token
 	TArray<FString> TokenParts;
@@ -174,10 +187,10 @@ void JWT::GetPayload(FString Token, FJsonObject* OutObject)
 	AsJsonObject(Payload, OutObject);
 }
 
-void JWT::AsJsonObject(FString Target, FJsonObject* Output)
+// Deserializes a json string to a JSON object
+void JWT::AsJsonObject(FString Target, TSharedPtr<FJsonObject>* Output)
 {
 	// Convert the payload to an FJsonObject
-	TSharedPtr<FJsonObject> PayloadAsObject = MakeShareable(Output);
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Target);
-	FJsonSerializer::Deserialize(Reader, PayloadAsObject);
+	bool success = FJsonSerializer::Deserialize(Reader, *Output);
 }

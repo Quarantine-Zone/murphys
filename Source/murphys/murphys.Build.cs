@@ -12,7 +12,7 @@ public class murphys : ModuleRules
 
     private string ThirdPartyPath
     {
-        get { return Path.GetFullPath(Path.Combine(ModulePath, "../../ThirdParty/")); }
+        get { return Path.GetFullPath(Path.Combine(ModulePath, "../../ThirdParty")); }
     }
 
     public murphys(ReadOnlyTargetRules Target) : base(Target)

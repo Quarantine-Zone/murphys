@@ -24,9 +24,12 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	uint64 GetSteamID();
+	UFUNCTION(BlueprintCallable)
+	FString GetSteamID();
 
+	UFUNCTION(BlueprintCallable)
 	FString GetPlayerName();
 	
+	UFUNCTION(BlueprintCallable)
 	int GetPlayerPing();
 };

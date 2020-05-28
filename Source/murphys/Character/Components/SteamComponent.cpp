@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerState.h"
 #include "ThirdParty/Steamworks/Steamv146/sdk/public/steam/steam_api.h"
+#include <string>
 
 // Sets default values for this component's properties
 USteamComponent::USteamComponent()
@@ -36,16 +37,18 @@ void USteamComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	// ...
 }
 
-uint64 USteamComponent::GetSteamID()
+FString USteamComponent::GetSteamID()
 {
 	if (SteamAPI_Init())
 	{
-		uint64 SID = SteamUser()->GetSteamID().ConvertToUint64();
+		uint64 sidInt = SteamUser()->GetSteamID().ConvertToUint64();
+
+		FString SID = FString(std::to_string(sidInt).c_str());
 
 		return SID;
 	}
 	
-	return 0;
+	return "";
 }
 
 FString USteamComponent::GetPlayerName()
