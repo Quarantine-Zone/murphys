@@ -2,6 +2,7 @@
 
 
 #include "Starfighter_pawn.h"
+#include "Projectile.h"
 #include "StarfighterPlayerController.h" 
 #include "DrawDebugHelpers.h"
 
@@ -16,20 +17,42 @@ AStarfighter_pawn::AStarfighter_pawn()
 void AStarfighter_pawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	LastFiredTime = GetWorld()->GetTimeSeconds();
 }
+
+void AStarfighter_pawn::SetFighterMeshReference(UStaticMeshComponent* FighterMeshReference)
+{
+	FighterMesh = FighterMeshReference;
+}
+
 
 // Called every frame
 void AStarfighter_pawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	apply_Rotation(DeltaTime);
-	
+
 	apply_internal_forces(DeltaTime);
 
 	// move fighter according to velocity
 	FVector translation = Velocity * DeltaTime * 100;
 	AddActorWorldOffset(translation);
+
+	//Handle weapons systems
+	
+	//
+
+	if (MainWeaponEnabled)
+	{
+		auto time = GetWorld()->GetTimeSeconds();
+		if (time - LastFiredTime > MainWeaponFireRate) 
+		{
+			FireMainWeapon();
+			LastFiredTime = time;
+		}
+	}
 
 	if (ShowDebugInfo) 
 	{
@@ -55,6 +78,8 @@ void AStarfighter_pawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	//Engine On/Off
 	//Beam Hook On/Off
 	//Fire Lasers
+	PlayerInputComponent->BindAction("ActionLMB", IE_Pressed, this, &AStarfighter_pawn::input_Activate_MainWeapon);
+	PlayerInputComponent->BindAction("ActionLMB", IE_Released, this, &AStarfighter_pawn::input_Deactivate_MainWeapon);
 
 }
 
@@ -115,6 +140,53 @@ void AStarfighter_pawn::apply_internal_forces(float DeltaTime)
 	}
 	GetController();
 }
+
+void AStarfighter_pawn::FireMainWeapon()
+{
+	
+
+	FName SocketName;
+	if (LeftFiredLast)
+	{
+		SocketName = FName("RightLaserSocket");
+		LeftFiredLast = false;
+	}
+	else
+	{
+		SocketName = FName("LeftLaserSocket");
+		LeftFiredLast = true;
+	}
+
+	float offset = 100;
+	auto spawnRotation = FighterMesh->GetSocketRotation(SocketName);
+	auto spawnLocation = FighterMesh->GetSocketLocation(SocketName) + ForwardVector.GetSafeNormal() * offset;
+
+	AProjectile* Proj = GetWorld()->SpawnActor<AProjectile>(MainWeaponProjectileBlueprint,
+															spawnLocation,
+															spawnRotation);
+	Proj->LaunchProjectile();
+}
+
+float AStarfighter_pawn::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, AActor * DamageCauser)
+{
+	int32 DamagePoints = FPlatformMath::RoundToInt(DamageAmount);
+	int32 DamageToApply = FMath::Clamp(DamagePoints, 0, CurrentHealth);
+
+	CurrentHealth -= DamageToApply;
+	((APlayerController *) GetController())->((UStarfighterHUD *) GetHUD())->
+	UE_LOG(LogTemp, Warning, TEXT("Fighter Hit! Health = (%f/%f)"), CurrentHealth, MaxHealth)
+	if (CurrentHealth <= 0)	OnDeath();
+	return DamageToApply;
+}
+
+void AStarfighter_pawn::OnDeath()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Fighter died"))
+	// explode and destroy ship
+	// notify game state
+	// delete actor and send PC to respawn waiting room
+}
+
 //========================================================================
 //player input functions
 //========================================================================
@@ -182,6 +254,29 @@ bool AStarfighter_pawn::Server_SetPitch_Validate(float value)
 void AStarfighter_pawn::Server_SetPitch_Implementation(float value)
 {
 	pitch += value;
+}
+//=============================================================================
+//Input Action Functions
+//=============================================================================
+void AStarfighter_pawn::input_Activate_MainWeapon()
+{
+	Server_Toggle_MainWeapon(true);
+}
+
+void AStarfighter_pawn::input_Deactivate_MainWeapon()
+{
+	Server_Toggle_MainWeapon(false);
+}
+
+// server replication
+bool AStarfighter_pawn::Server_Toggle_MainWeapon_Validate(bool enabled)
+{
+	return true;
+}
+
+void AStarfighter_pawn::Server_Toggle_MainWeapon_Implementation(bool enabled)
+{
+	MainWeaponEnabled = enabled;
 }
 //==============================================================================
 //debug helpers

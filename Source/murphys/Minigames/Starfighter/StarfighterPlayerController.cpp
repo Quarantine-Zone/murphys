@@ -19,10 +19,3 @@ FVector2D AStarfighterPlayerController::GetSteeringVector()
 	return SteeringVector;
 
 }
-
-/*
-void AStarfighterPlayerController::Server_TeamSelected(APlayerController* player, TeamEnum team)
-{
-	
-}
-*/

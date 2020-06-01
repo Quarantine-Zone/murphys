@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Projectile.h"
 #include "Starfighter_pawn.generated.h"
 
 UCLASS()
@@ -17,6 +18,9 @@ class MURPHYS_API AStarfighter_pawn : public APawn
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	UFUNCTION(BlueprintCallable)
+	void SetFighterMeshReference(UStaticMeshComponent* FighterMeshReference);
 
 public:	
 	// Called every frame
@@ -28,10 +32,17 @@ public:
 	//Used by the HUD to Animate the targeting reticle 
 	UPROPERTY(BlueprintReadWrite)
 	FVector2D SteeringVectorUI;
+	//=====================================================================
+	// Ship Health
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MaxHealth = 100;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CurrentHealth = MaxHealth;
+	//=====================================================================
 private:
 	//=====================================================================
-	bool ShowDebugInfo = true;
+	bool ShowDebugInfo = false;
 	//=====================================================================
 	// Ship Control Inputs
 	//=====================================================================
@@ -43,6 +54,7 @@ private:
 
 	bool InertialDampingEnabled = true;
 	bool ForwardThrustersEnabled = true;
+	bool MainWeaponEnabled = false;
 	//====================================================================
 	// Ship Motion/Physics
 	//====================================================================
@@ -51,6 +63,11 @@ private:
 	//====================================================================
 	// Ship Stats
 	//====================================================================
+	
+	
+	UPROPERTY(EditAnywhere)
+	float MainWeaponFireRate = .5;
+
 	UPROPERTY(EditAnywhere)
 	float Mass = 100;
 	
@@ -71,19 +88,31 @@ private:
 	//
 	// this subsystem is intended to make piloting in combat easier, 
 	// and can be easily turned on and off by the ship's pilot
-	
-
+	//====================================================================
+	// Weapons system helper variables 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AProjectile> MainWeaponProjectileBlueprint;
+	UStaticMeshComponent* FighterMesh;
+	bool LeftFiredLast = false;
+	float LastFiredTime;
 	//====================================================================
 	// pysics simulation functions
 	void apply_Rotation(float DeltaTime);
 	void apply_internal_forces(float DeltaTime);
+	
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, AActor * DamageCauser) override;
+	void OnDeath();
+	//=====================================================================
+	// Input Actions
+	void FireMainWeapon();
 
 	//=====================================================================
 	//Input Axis Mappings
-		void input_SetThrottle(float value);
-		void input_SetPitch(float value);
-		void input_SetRoll(float value);
-		void input_SetYaw(float value);
+	void input_SetThrottle(float value);
+	void input_SetPitch(float value);
+	void input_SetRoll(float value);
+	void input_SetYaw(float value);
 	//Server Input Replication
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetThrottle(float value);
@@ -96,6 +125,15 @@ private:
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetYaw(float value);
+	//=====================================================================
+	//Input Action Mappings
+	void input_Activate_MainWeapon();
+	void input_Deactivate_MainWeapon();
+
+	//Replication
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_Toggle_MainWeapon(bool enabled);
+
 	//=====================================================================
 	// Debug Helpers
 	FString GetEnumText(ENetRole Role);
