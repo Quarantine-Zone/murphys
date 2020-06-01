@@ -32,7 +32,14 @@ public:
 	//Used by the HUD to Animate the targeting reticle 
 	UPROPERTY(BlueprintReadWrite)
 	FVector2D SteeringVectorUI;
+	//=====================================================================
+	// Ship Health
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MaxHealth = 100;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CurrentHealth = MaxHealth;
+	//=====================================================================
 private:
 	//=====================================================================
 	bool ShowDebugInfo = false;
@@ -56,11 +63,10 @@ private:
 	//====================================================================
 	// Ship Stats
 	//====================================================================
-	UPROPERTY(EditAnywhere)
-	float Health = 100;
+	
 	
 	UPROPERTY(EditAnywhere)
-	float MainWeaponFireRate = 1;
+	float MainWeaponFireRate = .5;
 
 	UPROPERTY(EditAnywhere)
 	float Mass = 100;
@@ -94,6 +100,9 @@ private:
 	void apply_Rotation(float DeltaTime);
 	void apply_internal_forces(float DeltaTime);
 	
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, AActor * DamageCauser) override;
+	void OnDeath();
 	//=====================================================================
 	// Input Actions
 	void FireMainWeapon();

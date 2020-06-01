@@ -157,12 +157,36 @@ void AStarfighter_pawn::FireMainWeapon()
 		LeftFiredLast = true;
 	}
 
-	
+	float offset = 100;
+	auto spawnRotation = FighterMesh->GetSocketRotation(SocketName);
+	auto spawnLocation = FighterMesh->GetSocketLocation(SocketName) + ForwardVector.GetSafeNormal() * offset;
+
 	AProjectile* Proj = GetWorld()->SpawnActor<AProjectile>(MainWeaponProjectileBlueprint,
-								   FighterMesh->GetSocketLocation(SocketName),
-								   FighterMesh->GetSocketRotation(SocketName));
+															spawnLocation,
+															spawnRotation);
 	Proj->LaunchProjectile();
 }
+
+float AStarfighter_pawn::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, AActor * DamageCauser)
+{
+	int32 DamagePoints = FPlatformMath::RoundToInt(DamageAmount);
+	int32 DamageToApply = FMath::Clamp(DamagePoints, 0, CurrentHealth);
+
+	CurrentHealth -= DamageToApply;
+	((APlayerController *) GetController())->((UStarfighterHUD *) GetHUD())->
+	UE_LOG(LogTemp, Warning, TEXT("Fighter Hit! Health = (%f/%f)"), CurrentHealth, MaxHealth)
+	if (CurrentHealth <= 0)	OnDeath();
+	return DamageToApply;
+}
+
+void AStarfighter_pawn::OnDeath()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Fighter died"))
+	// explode and destroy ship
+	// notify game state
+	// delete actor and send PC to respawn waiting room
+}
+
 //========================================================================
 //player input functions
 //========================================================================
@@ -236,13 +260,11 @@ void AStarfighter_pawn::Server_SetPitch_Implementation(float value)
 //=============================================================================
 void AStarfighter_pawn::input_Activate_MainWeapon()
 {
-	MainWeaponEnabled = true;
 	Server_Toggle_MainWeapon(true);
 }
 
 void AStarfighter_pawn::input_Deactivate_MainWeapon()
 {
-	MainWeaponEnabled = false;
 	Server_Toggle_MainWeapon(false);
 }
 
