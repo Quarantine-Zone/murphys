@@ -18,7 +18,7 @@ void SLoadingMenuWidget::Construct(const FArguments &InArgs)
 		"No one expects the Spanish Inquisition",
 		"Ethan is Ok sometines",
 		"There are 10 types of people in the world, those who understand binary, and those who don't",
-		"What does Coors Light have in common with people making love in a cannoe? ...They're fucking close to water",
+		"people are crazy",
 		"Do it, you won't",
 		"It's all fun and games until someone gets a seg fault.",
 		"Thank you for reading this"
